@@ -1,0 +1,35 @@
+name: Marketing Content Generation
+
+on:
+  schedule:
+    # JST: 09:30 / 12:00 / 20:30
+    - cron: "30 0 * * *"
+    - cron: "0 3 * * *"
+    - cron: "30 11 * * *"
+  workflow_dispatch:
+    inputs:
+      theme:
+        description: "コンテンツテーマ"
+        required: false
+        default: "バイブコーディングの限界と dev-OS の必要性"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - name: Generate marketing content
+        run: |
+          npx ts-node scripts/marketing/generate_content.ts "${{ github.event.inputs.theme || 'バイブコーディングの限界' }}"
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketing-content
+          path: outputs/marketing/
+

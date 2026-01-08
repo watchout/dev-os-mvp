@@ -1,0 +1,36 @@
+name: devos selfcheck
+
+on:
+  push:
+    paths:
+      - 'ssot/**'
+      - 'workflows.yml'
+      - 'workspace_llm_config.json'
+      - 'scripts/devos_selfcheck.ts'
+      - 'apps/web-console/**'
+      - '.github/workflows/devos-selfcheck.yml'
+  pull_request: {}
+
+jobs:
+  selfcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run devos:selfcheck
+        run: npm run devos:selfcheck
+
+
+
+

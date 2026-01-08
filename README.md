@@ -1,36 +1,83 @@
-# dev-os-mvp Platform
+# dev-OS Platform
 
-AIを使ったSaaS/アプリ開発のための「破綻しない開発OS」MVPプラットフォーム。
+dev-OS の本番用 Web コンソール。
 
-## これは何をするものか
+## 技術スタック
 
-- spec-first / SSOT / 複数LLMチェックを前提にした開発フローを提供
-- 実装そのもの（コード生成）は Cursor 等のIDEが担当
-- このリポジトリは「仕様・SSOT・ワークフロー」を一元管理する
+- **Frontend**: Next.js 15 (App Router) + Tailwind CSS
+- **Auth**: Supabase Auth
+- **Database**: PostgreSQL (Supabase)
+- **ORM**: Prisma
 
-## Getting Started
+## セットアップ
+
+### 1. 環境変数の設定
 
 ```bash
-# 依存関係のインストール
-npm install
+# テンプレートをコピー
+cp env.template .env.local
+cp env.template .env
+```
 
+Supabase ダッシュボードから以下の値を取得して設定：
+
+| 変数 | 取得場所 |
+|------|----------|
+| `DATABASE_URL` | Settings > Database > Connection string (Transaction) |
+| `DIRECT_URL` | Settings > Database > Connection string (Session) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Settings > API > Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Settings > API > anon public |
+| `SUPABASE_SERVICE_ROLE_KEY` | Settings > API > service_role |
+
+### 2. 依存関係のインストール
+
+```bash
+npm install
+```
+
+### 3. データベースマイグレーション
+
+```bash
 # Prisma クライアント生成
 npx prisma generate
 
-# 開発サーバー起動
+# マイグレーション実行（初回）
+npx prisma migrate dev --name init
+```
+
+### 4. 開発サーバー起動
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:5100](http://localhost:5100) with your browser.
+http://localhost:3000 でアクセス。
 
-## Available Scripts
+## ディレクトリ構成
 
-- `npm run dev` - 開発サーバー起動
-- `npm run build` - 本番ビルド
-- `npm run typecheck` - TypeScript 型チェック
-- `npm run lint` - ESLint 実行
-- `npm run test` - Vitest テスト実行
+```
+apps/platform/
+├── prisma/
+│   └── schema.prisma    # DB スキーマ（ssot/platform.yml から生成）
+├── src/
+│   ├── app/             # Next.js App Router
+│   ├── components/      # UI コンポーネント
+│   ├── lib/             # ユーティリティ
+│   │   ├── prisma.ts    # Prisma クライアント
+│   │   └── supabase/    # Supabase クライアント
+│   └── generated/
+│       └── prisma/      # Prisma 生成コード
+├── env.template         # 環境変数テンプレート
+└── package.json
+```
 
-## 詳細仕様
+## SSOT との関係
 
-👉 [docs/DEV_OS_SPEC.md](../../docs/DEV_OS_SPEC.md)
+このプロジェクトのデータモデルは `ssot/platform.yml` を正本としています。
+スキーマ変更は SSOT を先に更新し、その後 Prisma スキーマに反映してください。
+
+## 開発ルール
+
+- 認証は Supabase Auth に委任
+- API キーは AES-256-GCM で暗号化して保存
+- 監査ログは重要な操作で必ず記録

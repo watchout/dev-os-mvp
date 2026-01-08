@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String               @id @default(uuid()) @db.Uuid
+  authProviderId      String               @unique @map("auth_provider_id")
+  email               String               @unique
+  name                String
+  avatarUrl           String?              @map("avatar_url")
+  emailVerifiedAt     DateTime?            @map("email_verified_at")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  apiKeysCreated      ApiKey[]             @relation("ApiKeyCreatedBy")
+  auditLogs           AuditLog[]
+  executionLogs       ExecutionLog[]
+  organizationMembers OrganizationMember[]
+
+  @@map("users")
+}
+
+model Organization {
+  id                   String               @id @default(uuid()) @db.Uuid
+  name                 String
+  slug                 String               @unique
+  planId               PlanType             @default(free) @map("plan_id")
+  billingEmail         String?              @map("billing_email")
+  stripeCustomerId     String?              @map("stripe_customer_id")
+  stripeSubscriptionId String?              @map("stripe_subscription_id")
+  createdAt            DateTime             @default(now()) @map("created_at")
+  updatedAt            DateTime             @updatedAt @map("updated_at")
+  apiKeys              ApiKey[]
+  auditLogs            AuditLog[]
+  creditUsages         CreditUsage[]
+  executionLogs        ExecutionLog[]
+  members              OrganizationMember[]
+  workspaces           Workspace[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  role           MemberRole
+  invitedAt      DateTime     @default(now()) @map("invited_at")
+  joinedAt       DateTime?    @map("joined_at")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model Workspace {
+  id                   String         @id @default(uuid()) @db.Uuid
+  organizationId       String         @map("organization_id") @db.Uuid
+  name                 String
+  slug                 String
+  description          String?
+  githubRepoUrl        String?        @map("github_repo_url")
+  githubInstallationId String?        @map("github_installation_id")
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+  executionLogs        ExecutionLog[]
+  organization         Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, slug])
+  @@map("workspaces")
+}
+
+model ApiKey {
+  id             String         @id @default(uuid()) @db.Uuid
+  organizationId String         @map("organization_id") @db.Uuid
+  provider       LlmProvider
+  label          String
+  encryptedKey   String         @map("encrypted_key")
+  keyPrefix      String         @map("key_prefix")
+  isDefault      Boolean        @default(false) @map("is_default")
+  isActive       Boolean        @default(true) @map("is_active")
+  lastUsedAt     DateTime?      @map("last_used_at")
+  createdById    String         @map("created_by") @db.Uuid
+  createdAt      DateTime       @default(now()) @map("created_at")
+  createdBy      User           @relation("ApiKeyCreatedBy", fields: [createdById], references: [id])
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  executionLogs  ExecutionLog[]
+
+  @@map("api_keys")
+}
+
+model ExecutionLog {
+  id             String          @id @default(uuid()) @db.Uuid
+  organizationId String          @map("organization_id") @db.Uuid
+  workspaceId    String?         @map("workspace_id") @db.Uuid
+  userId         String          @map("user_id") @db.Uuid
+  workflowId     String          @map("workflow_id")
+  commandTag     String?         @map("command_tag")
+  billingType    BillingType     @map("billing_type")
+  apiKeyId       String?         @map("api_key_id") @db.Uuid
+  inputSummary   String          @map("input_summary")
+  outputSummary  String?         @map("output_summary")
+  confidenceLevel Int?           @map("confidence_level")
+  confidenceData Json?           @map("confidence_data")
+  halt           Boolean         @default(false)
+  haltTriggerIds Json?           @map("halt_trigger_ids")
+  tokenUsage     Json            @map("token_usage")
+  durationMs     Int             @map("duration_ms")
+  status         ExecutionStatus @default(success)
+  errorMessage   String?         @map("error_message")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  apiKey         ApiKey?         @relation(fields: [apiKeyId], references: [id])
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workspace      Workspace?      @relation(fields: [workspaceId], references: [id])
+  user           User            @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([userId, createdAt])
+  @@map("execution_logs")
+}
+
+model CreditUsage {
+  id                 String       @id @default(uuid()) @db.Uuid
+  organizationId     String       @map("organization_id") @db.Uuid
+  yearMonth          String       @map("year_month")
+  totalInputTokens   BigInt       @default(0) @map("total_input_tokens")
+  totalOutputTokens  BigInt       @default(0) @map("total_output_tokens")
+  estimatedCostUsd   Decimal      @default(0) @map("estimated_cost_usd") @db.Decimal(10, 4)
+  platformCreditUsed Decimal      @default(0) @map("platform_credit_used") @db.Decimal(10, 4)
+  byoTokenCount      BigInt       @default(0) @map("byo_token_count")
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, yearMonth])
+  @@map("credit_usages")
+}
+
+model AuditLog {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  action         String
+  resourceType   String       @map("resource_type")
+  resourceId     String?      @map("resource_id") @db.Uuid
+  metadata       Json?
+  ipAddress      String?      @map("ip_address")
+  userAgent      String?      @map("user_agent")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+enum PlanType {
+  free
+  pro
+  team
+  enterprise
+}
+
+enum MemberRole {
+  owner
+  admin
+  member
+  viewer
+}
+
+enum LlmProvider {
+  openai
+  anthropic
+  google
+  custom
+}
+
+enum BillingType {
+  platform_credit
+  byo_key
+}
+
+enum ExecutionStatus {
+  success
+  halted
+  error
+}
