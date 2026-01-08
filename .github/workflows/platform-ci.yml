@@ -37,6 +37,8 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    env:
+      ENCRYPTION_SECRET: "test-secret-key-for-ci-32bytes!"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
