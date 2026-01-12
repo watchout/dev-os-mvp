@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth, requireMembership, ensureAdminOrOwner, ApiError } from "@/lib/auth";
 import { MemberRole } from "@/generated/prisma";
+import prisma from "@/lib/prisma";
+import { createOrgScopedDb } from "@/lib/orgScopedDb";
 
 type InviteRequest = {
   email?: string;
@@ -17,8 +18,10 @@ export async function GET(
     const { id: organizationId } = await params;
     await requireMembership(user.id, organizationId);
 
-    const members = await prisma.organizationMember.findMany({
-      where: { organizationId },
+    const db = createOrgScopedDb(organizationId);
+
+    const members = await db.organizationMember.findMany({
+      where: {},
       orderBy: { invitedAt: "asc" },
       include: {
         user: {
@@ -58,6 +61,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const membership = await requireMembership(user.id, organizationId);
     ensureAdminOrOwner(membership.role);
 
+    const db = createOrgScopedDb(organizationId);
+
     const body = (await request.json()) as InviteRequest;
     const email = typeof body.email === "string" ? body.email.trim() : "";
     const roleInput = typeof body.role === "string" ? body.role : "";
@@ -89,9 +94,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       throw new ApiError(409, "User is already a member of this organization", "ALREADY_MEMBER");
     }
 
-    const member = await prisma.organizationMember.create({
+    const member = await db.organizationMember.create({
       data: {
-        organizationId,
         userId: invitee.id,
         role,
         invitedAt: new Date(),

@@ -13,54 +13,60 @@
  */
 
 import prisma from '@/lib/prisma';
-import type { Prisma } from '@/generated/prisma';
 
 // Organization ID のブランド型（型安全性を高める）
 export type OrganizationId = string & { readonly __brand: 'OrganizationId' };
 
 // organization_id を持つテーブルのリスト
-type OrgScopedModels = 'workspace' | 'executionLog' | 'apiKey' | 'auditLog';
+type OrgScopedModels = 'workspace' | 'executionLog' | 'apiKey' | 'auditLog' | 'organizationMember';
 
 /**
  * Organization-scoped な読み取りクエリビルダー
  *
- * Read 系メソッドのみを提供（Phase 1: Read only）
- * Write 系は SEC-02 で追加予定
+ * Read/Write メソッドを提供
+ * include オプションをサポートするため、戻り値型は Promise<any> に緩和
  */
 export interface OrgScopedReader<T extends OrgScopedModels> {
   /**
    * findMany with automatic organization_id scoping
+   * Supports include option for relations
    */
-  findMany<Args extends Omit<Parameters<typeof prisma[T]['findMany']>[0], 'where'> & {
-    where?: Omit<NonNullable<Parameters<typeof prisma[T]['findMany']>[0]>['where'], 'organizationId'>;
-  }>(
-    args?: Args
-  ): ReturnType<typeof prisma[T]['findMany']>;
+  findMany(args?: {
+    where?: Record<string, unknown>;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+    orderBy?: Record<string, unknown> | Record<string, unknown>[];
+    take?: number;
+    skip?: number;
+  }): Promise<any[]>;
 
   /**
    * findFirst with automatic organization_id scoping
+   * Supports include option for relations
    */
-  findFirst<Args extends Omit<Parameters<typeof prisma[T]['findFirst']>[0], 'where'> & {
-    where?: Omit<NonNullable<Parameters<typeof prisma[T]['findFirst']>[0]>['where'], 'organizationId'>;
-  }>(
-    args?: Args
-  ): ReturnType<typeof prisma[T]['findFirst']>;
+  findFirst(args?: {
+    where?: Record<string, unknown>;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+    orderBy?: Record<string, unknown> | Record<string, unknown>[];
+  }): Promise<any | null>;
 
   /**
    * findUnique - requires id + organizationId scope
+   * Supports include option for relations
    */
-  findUnique<Args extends Omit<Parameters<typeof prisma[T]['findUnique']>[0], 'where'>>(
-    args: Args & { where: { id: string } }
-  ): ReturnType<typeof prisma[T]['findUnique']>;
+  findUnique(args: {
+    where: { id: string };
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+  }): Promise<any | null>;
 
   /**
    * count with automatic organization_id scoping
    */
-  count<Args extends Omit<Parameters<typeof prisma[T]['count']>[0], 'where'> & {
-    where?: Omit<NonNullable<Parameters<typeof prisma[T]['count']>[0]>['where'], 'organizationId'>;
-  }>(
-    args?: Args
-  ): ReturnType<typeof prisma[T]['count']>;
+  count(args?: {
+    where?: Record<string, unknown>;
+  }): Promise<number>;
 }
 
 /**
@@ -69,33 +75,34 @@ export interface OrgScopedReader<T extends OrgScopedModels> {
 export interface OrgScopedWriter<T extends OrgScopedModels> {
   /**
    * create with automatic organization_id injection
+   * Supports select/include options
    */
-  create<Args extends Omit<Parameters<typeof prisma[T]['create']>[0], 'data'> & {
-    data: Omit<NonNullable<Parameters<typeof prisma[T]['create']>[0]>['data'], 'organizationId'> & {
-      organizationId?: string;
-    };
-  }>(
-    args: Args
-  ): ReturnType<typeof prisma[T]['create']>;
+  create(args: {
+    data: Record<string, unknown>;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+  }): Promise<any>;
 
   /**
    * update with organization_id scoping (AND)
+   * Supports select/include options
    */
-  update<Args extends Omit<Parameters<typeof prisma[T]['update']>[0], 'where' | 'data'> & {
-    where: Omit<NonNullable<Parameters<typeof prisma[T]['update']>[0]>['where'], 'organizationId'>;
-    data: Omit<NonNullable<Parameters<typeof prisma[T]['update']>[0]>['data'], 'organizationId'>;
-  }>(
-    args: Args
-  ): ReturnType<typeof prisma[T]['update']>;
+  update(args: {
+    where: Record<string, unknown>;
+    data: Record<string, unknown>;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+  }): Promise<any>;
 
   /**
    * delete with organization_id scoping (AND)
+   * Supports select/include options
    */
-  delete<Args extends Omit<Parameters<typeof prisma[T]['delete']>[0], 'where'> & {
-    where: Omit<NonNullable<Parameters<typeof prisma[T]['delete']>[0]>['where'], 'organizationId'>;
-  }>(
-    args: Args
-  ): ReturnType<typeof prisma[T]['delete']>;
+  delete(args: {
+    where: Record<string, unknown>;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+  }): Promise<any>;
 }
 
 /**
@@ -117,6 +124,7 @@ export interface OrgScopedDb {
   readonly executionLog: OrgScopedAccessor<'executionLog'>;
   readonly apiKey: OrgScopedAccessor<'apiKey'>;
   readonly auditLog: OrgScopedAccessor<'auditLog'>;
+  readonly organizationMember: OrgScopedAccessor<'organizationMember'>;
 }
 
 /**
@@ -211,6 +219,7 @@ export function createOrgScopedDb(organizationId: string): OrgScopedDb {
     executionLog: createAccessor('executionLog'),
     apiKey: createAccessor('apiKey'),
     auditLog: createAccessor('auditLog'),
+    organizationMember: createAccessor('organizationMember'),
   };
 }
 

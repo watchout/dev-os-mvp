@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth, requireMembership, ensureAdminOrOwner, ApiError } from "@/lib/auth";
 import { MemberRole } from "@/generated/prisma";
+import prisma from "@/lib/prisma";
+import { createOrgScopedDb } from "@/lib/orgScopedDb";
 
 type UpdateRequest = {
   role?: MemberRole | string;
@@ -17,6 +18,8 @@ export async function PATCH(
     const callerMembership = await requireMembership(user.id, organizationId);
     ensureAdminOrOwner(callerMembership.role);
 
+    const db = createOrgScopedDb(organizationId);
+
     const body = (await request.json()) as UpdateRequest;
     const roleInput = typeof body.role === "string" ? body.role.toLowerCase() : "";
     const allowedRoles: MemberRole[] = [MemberRole.admin, MemberRole.member, MemberRole.viewer];
@@ -25,7 +28,7 @@ export async function PATCH(
     }
 
     // 対象メンバー取得
-    const target = await prisma.organizationMember.findUnique({
+    const target = await db.organizationMember.findUnique({
       where: { id: memberId },
     });
     if (!target || target.organizationId !== organizationId) {
@@ -47,7 +50,7 @@ export async function PATCH(
       }
     }
 
-    const updated = await prisma.organizationMember.update({
+    const updated = await db.organizationMember.update({
       where: { id: memberId },
       data: { role: roleInput as MemberRole },
       include: {
@@ -83,7 +86,9 @@ export async function DELETE(
     const { id: organizationId, memberId } = await params;
     const callerMembership = await requireMembership(user.id, organizationId);
 
-    const target = await prisma.organizationMember.findUnique({
+    const db = createOrgScopedDb(organizationId);
+
+    const target = await db.organizationMember.findUnique({
       where: { id: memberId },
     });
     if (!target || target.organizationId !== organizationId) {
@@ -118,7 +123,7 @@ export async function DELETE(
       }
     }
 
-    await prisma.organizationMember.delete({ where: { id: memberId } });
+    await db.organizationMember.delete({ where: { id: memberId } });
     return NextResponse.json({ data: { message: "Member removed" } });
   } catch (error: any) {
     return NextResponse.json(
