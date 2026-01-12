@@ -1,15 +1,18 @@
 name: devos selfcheck
 
+# TODO: Re-enable after migrating devos_selfcheck.ts to apps/platform
+# Temporarily disabled - will be addressed in "selfcheck CI常設" task
 on:
-  push:
-    paths:
-      - 'ssot/**'
-      - 'workflows.yml'
-      - 'workspace_llm_config.json'
-      - 'scripts/devos_selfcheck.ts'
-      - 'apps/web-console/**'
-      - '.github/workflows/devos-selfcheck.yml'
-  pull_request: {}
+  workflow_dispatch: {}  # Manual trigger only for now
+  # push:
+  #   paths:
+  #     - 'ssot/**'
+  #     - 'workflows.yml'
+  #     - 'workspace_llm_config.json'
+  #     - 'scripts/devos_selfcheck.ts'
+  #     - 'apps/web-console/**'
+  #     - '.github/workflows/devos-selfcheck.yml'
+  # pull_request: {}
 
 jobs:
   selfcheck:
