@@ -1,0 +1,115 @@
+project:
+  id: dev-os-mvp
+  name: "IYASAKA dev-OS"
+  owner: "Kaneko"
+  description: >
+    IYASAKA ブランドの「整える（Foundation）」を担う、AI 開発OS。
+    現場の「不透明・不安」な設計を、SSOT（仕様正本）と多重監査によって
+    「確信」へと変換し、破綻しない SaaS 開発を実現する基盤。
+
+  domain:
+    primary: "ai-dev-os"
+    tags:
+      - "整える"
+      - "ssot"
+      - "multi-llm"
+      - "governance"
+      - "saas"
+
+  # ===== VMV =====
+  vmv:
+    vision: >
+      AI開発のブラックボックス化を解消し、現場の知恵を「確信」へと変える。
+    mission: >
+      SSOT（正本）と多重監査ワークフローを提供し、
+      あらゆる現場に「ちょうどいい」デジタル化と設計の規律をもたらす。
+    values:
+      - "不を光へ（課題を価値に変換する）"
+      - "現場第一主義（溜息を消す設計）"
+      - "弥栄の循環（共創と品質の維持）"
+      - "正本（SSOT）ファースト"
+
+  # ===== ターゲット戦略（2026-01-02 マーケティング監修により追加） =====
+  target:
+    strategy: "niche-first"
+    description: >
+      まず狭いセグメントで圧倒的な支持を得てから、徐々に拡大する戦略。
+      カテゴリー創造型のため市場教育コストが高く、広告効率を重視する。
+    
+    primary:
+      persona_ref: "primary-cto-takashi"  # ssot/personas.yml 参照
+      segment: "Cursor + Linear/Plane で開発している4〜10人のSaaSチーム"
+      core_pain: "AIに任せると、直すのに結局自分が入らないといけない"
+      value_proposition: "多重監査でAIがAIをチェック。人間の手直し工数を削減"
+    
+    secondary:
+      persona_ref: "secondary-indie-yuki"
+      segment: "本気の個人開発者・週末開発者"
+      core_pain: "プロトまでは作れるが、本番品質にする時間がない"
+      value_proposition: "SSOTとガバナンスで、本番に必要な要件を自動チェック"
+    
+    tertiary:
+      persona_ref: "tertiary-agency-kenji"
+      segment: "受託×自社プロダクトの開発スタジオ"
+      core_pain: "プロジェクトごとに開発ルールがバラバラ"
+      value_proposition: "テンプレート共有で複数プロジェクトの品質を統一"
+
+  # ===== ポジショニング =====
+  positioning:
+    category: "AI開発品質管理プラットフォーム"
+    tagline:
+      primary: "AIで作ったコード、結局自分で直してませんか？"
+      secondary: "仕様を正本にしてAIに作らせる、開発OS"
+    
+    differentiation:
+      - competitor: "Cursor / GitHub Copilot"
+        relationship: "補完"
+        description: "実装担当 vs 設計の正本化"
+      - competitor: "Notion / Confluence"
+        relationship: "代替"
+        description: "静的ドキュメント vs アクティブSSOT"
+      - competitor: "Linear / Plane"
+        relationship: "補完"
+        description: "タスク管理 vs 仕様→タスク→プロンプト一気通貫"
+
+  # ===== フェーズ (SaaS-first PLG ロードマップ) =====
+  phases:
+    - id: phase1
+      name: "Foundation (Core & Console Base)"
+      status: "in-progress"
+      goal: "SSOTエンジン中核とWebコンソール基盤の構築。ローカルでの実戦投入。"
+    - id: phase2
+      name: "SaaS Platform (PLG Readiness)"
+      status: "planned"
+      goal: "認証・組織管理・Freeプラン制限の実装。LP v2公開とウェイトリスト開始。"
+    - id: phase3
+      name: "Alpha / Early Access"
+      status: "planned"
+      goal: "BYOキー管理・Stripe課金連携。特定ユーザーへの限定公開と価値検証。"
+    - id: phase4
+      name: "Expansion & Ecosystem"
+      status: "planned"
+      goal: "GitHub/Linear連携、MCPサーバ化。外部ツールとのシームレスな統合。"
+
+  # ===== 関連SSOT =====
+  related_ssot:
+    personas: "ssot/personas.yml"
+    pricing: "ssot/pricing.yml"
+    marketing: "ssot/marketing.yml"
+    platform: "ssot/platform.yml"
+    features: "ssot/features.yml"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

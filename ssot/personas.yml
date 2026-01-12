@@ -1,0 +1,253 @@
+# ssot/personas.yml
+# dev-OS ペルソナ定義 - マーケティング戦略の基盤
+# 
+# 変更履歴:
+#   2026-01-02: 初版作成（マーケティング監修レポートに基づく）
+#   2026-01-03: リサーチに基づき情報収集チャネルを精緻化
+#               「AI感度の高いエンジニア」ペルソナを追加
+#               LinkedIn営業→X/note/Zenn発信に戦略変更
+
+# ===================================================================
+# リサーチ結果サマリー（2026-01-03調査）
+# ===================================================================
+# 日本エンジニアの情報収集チャネル利用率:
+#   - 検索エンジン（Google）: 71.3%
+#   - YouTube: 53.9%
+#   - 生成AIツール（ChatGPT等）: 28.7%
+#   - SNS（X/Instagram）: 20代で高い利用率
+#   - ウェビナー: 33%
+# 
+# ツール選定行動:
+#   - Xでバズっているのを見て知る
+#   - 同僚・知人からの紹介
+#   - Zenn/Qiita/noteの技術記事で知る
+#   - 無料で試せることが必須条件
+# ===================================================================
+
+personas:
+
+  # ===== プライマリペルソナ =====
+  - id: primary-cto-takashi
+    name: "孤軍奮闘CTOのタカシさん"
+    priority: primary
+    description: >
+      スタートアップのCTO・テックリードとして、少人数チームを率いながら
+      AI開発ツールを活用してスピードと品質の両立を目指している。
+      問題は認識しているが、解決策を探している状態。
+    
+    demographics:
+      age_range: "30〜40代"
+      role: "CTO / テックリード / リードエンジニア"
+      team_size: "4〜8人（自分含む）"
+      company_type: "スタートアップ / 成長期ベンチャー"
+      budget_authority: "月額10万円まで自己決裁可能"
+    
+    tech_stack:
+      editor: ["Cursor", "VSCode"]
+      ai_tools: ["Claude", "GPT-4", "GitHub Copilot"]
+      project_management: ["Linear", "Plane", "GitHub Issues"]
+      source_control: ["GitHub"]
+      language: ["TypeScript", "Python", "Go"]
+    
+    current_state:
+      description: "AIで速く作れるようになったが、品質とスピードのトレードオフに悩んでいる"
+      awareness_level: "high"  # 問題認識レベル: high/medium/low
+      solution_seeking: true   # 解決策を積極的に探しているか
+    
+    pain_points:
+      - rank: 1
+        pain: "バイブコーディング（感覚的プロンプト）では作りたいものが作れない"
+        intensity: "critical"  # critical/high/medium/low
+        frequency: "daily"
+        quote: "感覚でプロンプトを打つと、最初は速いが、複雑になるとAIが迷走して修正不能になる"
+      - rank: 2
+        pain: "AIに任せると、直すのに結局自分が入らないといけない"
+        intensity: "critical"
+        frequency: "daily"
+        quote: "結局、AIが書いたコードのレビューと修正に1日の半分使ってる。これじゃ開発効率50倍どころか、かえって遅い"
+      - rank: 3
+        pain: "メンバーにAI使わせると、品質がバラバラになる"
+        intensity: "high"
+        frequency: "weekly"
+        quote: "人によってプロンプトの書き方（バイブス）が違いすぎて、コードレビューが地獄。チームで品質を保てない"
+      - rank: 4
+        pain: "認証・課金・ログなど、SaaSの基本要件を毎回漏らす"
+        intensity: "medium"
+        frequency: "per_project"
+        quote: "リリース直前に『あ、監査ログ忘れてた』が多すぎる"
+    
+    goals:
+      - "AIを使っても品質を落とさずに開発スピードを上げたい"
+      - "チーム全体で同じ品質のアウトプットを出せるようにしたい"
+      - "仕様を属人化させず、誰でも理解できる状態にしたい"
+    
+    objections:
+      - "また新しいツール覚えるの？学習コストが心配"
+      - "既存のワークフローにどう組み込むの？"
+      - "本当に効果あるの？事例見せて"
+    
+    decision_criteria:
+      - "無料で試せるか（リスクなく始められるか）"
+      - "Cursor/Linear との統合がスムーズか"
+      - "導入後すぐに効果を実感できるか"
+    
+    channels:
+      discovery:
+        primary:
+          - channel: "X（Twitter）"
+            behavior: "フォローしてるエンジニアの投稿でバズってるのを見て知る"
+            importance: "critical"
+          - channel: "Zenn"
+            behavior: "技術記事を読んでいる中で発見"
+            importance: "high"
+          - channel: "note"
+            behavior: "思想系・事例記事で知る"
+            importance: "high"
+        secondary:
+          - channel: "Google検索"
+            behavior: "課題解決策を検索中に発見"
+            importance: "high"
+          - channel: "ChatGPT/Claude"
+            behavior: "AIに『AI開発の品質管理ツール』を聞く"
+            importance: "medium"
+          - channel: "同僚・知人"
+            behavior: "Slackや雑談で『これ使ってる』と聞く"
+            importance: "medium"
+      research: 
+        - channel: "公式LP"
+          action: "機能・料金を確認"
+        - channel: "GitHub README"
+          action: "技術的な詳細を確認"
+        - channel: "Zenn/note記事"
+          action: "使い方・事例を確認"
+        - channel: "YouTube"
+          action: "デモ動画を見る"
+      decision: 
+        - "無料プランで実際に試す（必須条件）"
+        - "5分以内に価値を体感できるか"
+        - "チームに導入提案（自分で決裁可能なら即決）"
+    
+    acquisition_insight:
+      key_trigger: "Xでバズっている投稿を見る or Zenn記事で発見"
+      conversion_blocker: "無料で試せない、学習コストが高い"
+      decision_timeframe: "発見から1週間以内に試用、1ヶ月以内に有料化判断"
+
+  # ===== セカンダリペルソナ =====
+  - id: secondary-indie-yuki
+    name: "週末開発者のユウキさん"
+    priority: secondary
+    description: >
+      本業の傍ら、個人開発でSaaSを作りたいと考えているエンジニア。
+      時間が限られる中でAIを活用して効率よく開発したいが、
+      プロトタイプ止まりで本番リリースまで到達できないことが多い。
+    
+    demographics:
+      age_range: "25〜35代"
+      role: "ソフトウェアエンジニア（本業あり）"
+      team_size: "1人（ソロ開発）"
+      company_type: "個人開発 / 副業"
+      budget_authority: "月額5,000円まで"
+    
+    tech_stack:
+      editor: ["Cursor", "VSCode"]
+      ai_tools: ["Claude", "ChatGPT"]
+      project_management: ["Notion", "GitHub Issues"]
+      source_control: ["GitHub"]
+      language: ["TypeScript", "Next.js"]
+    
+    current_state:
+      description: "プロトタイプまでは作れるが、本番品質にする時間と知識が足りない"
+      awareness_level: "medium"
+      solution_seeking: true
+    
+    pain_points:
+      - rank: 1
+        pain: "プロトまでは早いが、本番品質にする時間がない"
+        intensity: "critical"
+        frequency: "per_project"
+        quote: "土日だけだと、認証とか課金とか実装する時間が全然ない"
+      - rank: 2
+        pain: "AIに聞いても、毎回違う回答で混乱する"
+        intensity: "high"
+        frequency: "daily"
+        quote: "昨日と今日で真逆のこと言われて、どっちが正しいの？"
+    
+    goals:
+      - "限られた時間で本番リリースまで到達したい"
+      - "SaaSに必要な要件を漏れなく実装したい"
+    
+    objections:
+      - "個人開発に月1万は高い"
+      - "学習コストをかける時間がない"
+    
+    decision_criteria:
+      - "無料で十分使えるか"
+      - "すぐに始められるか（セットアップが簡単か）"
+      - "時間対効果が明確か"
+    
+    channels:
+      discovery: ["Twitter/X", "Zenn", "個人開発者コミュニティ"]
+      research: ["GitHub README", "チュートリアル動画"]
+      decision: ["無料プランでの体験"]
+
+  # ===== ターシャリペルソナ =====
+  - id: tertiary-agency-kenji
+    name: "受託×自社のケンジさん"
+    priority: tertiary
+    description: >
+      受託開発と自社プロダクト開発を並行して行うスタジオの責任者。
+      複数プロジェクトで開発ルールを統一し、属人化を排除したい。
+    
+    demographics:
+      age_range: "35〜45代"
+      role: "開発責任者 / 取締役CTO"
+      team_size: "10〜20人"
+      company_type: "開発スタジオ / SIer"
+      budget_authority: "月額30万円まで自己決裁可能"
+    
+    current_state:
+      description: "プロジェクトごとに開発ルールがバラバラで、品質管理に苦労している"
+      awareness_level: "high"
+      solution_seeking: true
+    
+    pain_points:
+      - rank: 1
+        pain: "プロジェクトごとに開発ルールがバラバラ"
+        intensity: "high"
+        frequency: "weekly"
+      - rank: 2
+        pain: "メンバーの入れ替わりで知識が失われる"
+        intensity: "high"
+        frequency: "monthly"
+    
+    goals:
+      - "複数プロジェクトで共通のSSOT・ルールを使いたい"
+      - "新メンバーのオンボーディングを短縮したい"
+    
+    decision_criteria:
+      - "複数プロジェクト対応が可能か"
+      - "テンプレート共有ができるか"
+      - "ROIが明確に示せるか"
+
+# ===== ペルソナ活用ガイド =====
+usage_guide:
+  lp_messaging:
+    primary_focus: "タカシさん（プライマリ）のペイン1・2に集中訴求"
+    secondary_consideration: "ユウキさん向けに無料プランの存在を明示"
+    avoid: "ケンジさん向けの訴求はLP下部のターゲットセクションに限定"
+  
+  pricing_alignment:
+    primary: "Team プランがタカシさんのスイートスポット"
+    secondary: "Free / Pro プランがユウキさん向け"
+    tertiary: "Enterprise プランがケンジさん向け"
+  
+  content_strategy:
+    primary_topics:
+      - "Cursor + SSOTで開発効率を上げる方法"
+      - "チームでAI開発の品質を統一するベストプラクティス"
+      - "プロト→本番の壁を越える具体的ステップ"
+    channels:
+      - "Zenn: 技術記事"
+      - "Twitter/X: 短めのTips"
+      - "YouTube: デモ動画"
+

@@ -1,0 +1,202 @@
+command_tags:
+
+  # SSOT: 会話タグ（>> write / impl / fix / rfv / next / prmt）定義
+  # - 役割: 「タグ → workflow → governance → prompt_templates」へのエントリーポイント
+  # - バージョン: スキーマ変更時は version を上げる
+  version: "1.0"
+
+  commands:
+
+    # =========================
+    # 1. >> write : SSOT新規作成
+    # =========================
+    - id: "write"
+      tag: ">> write"
+      label: "SSOT新規作成"
+      description: >
+        指定されたSSOT/仕様書を新規に書き起こすモード。
+        調査 → ドラフト作成 → 品質チェック までを含む。
+      defaultWorkflowId: "create_ssot"
+      defaultMode: "balanced"
+      requiredIntegrations:
+        - "ssot"      # 既存SSOT・governance 参照
+        - "repo"      # 既存コード／実装のリーディング
+      inputs:
+        - name: "ssot_id"
+          required: true
+          description: "作成対象SSOT識別子（例: SSOT_SAAS_STAFF_MANAGEMENT）"
+        - name: "context"
+          required: false
+          description: "背景・事業文脈・既存ドキュメントの参照など"
+      outputExpectations:
+        - "SSOTドラフト（YAML）"
+        - "品質チェックメモ（制約・未決事項・リスク）"
+      governanceProfile:
+        useHaltProtocol: true
+        haltTriggers:
+          - "ssot-ambiguous"
+          - "system-boundary-violation"
+
+    # =========================
+    # 2. >> impl : SSOT実装
+    # =========================
+    - id: "impl"
+      tag: ">> impl"
+      label: "SSOT実装"
+      description: >
+        既存SSOTに基づき、2〜3ファイル程度の変更で実装を行うモード。
+        SSOTを正本とし、PlaneのIssueと紐づいた形で小さな実装タスクを完了させる。
+      defaultWorkflowId: "impl_feature"
+      defaultMode: "balanced"
+      requiredIntegrations:
+        - "ssot"
+        - "plane"
+        - "governance"
+      inputs:
+        - name: "ssot_id"
+          required: true
+          description: "実装対象のSSOT ID（features.yml / 個別SSOTを指す）"
+        - name: "issue_id"
+          required: true
+          description: "Plane の Issue 番号"
+        - name: "change_scope_hint"
+          required: false
+          description: "想定される変更ファイル候補（2〜3ファイル）"
+      outputExpectations:
+        - "実装プラン（ステップ分解）"
+        - "変更ファイル一覧（2〜3ファイル）"
+        - "実装結果の要約・Evidence（テスト結果等）"
+      governanceProfile:
+        useHaltProtocol: true
+        haltTriggers:
+          - "system-boundary-violation"
+          - "tenant-isolation-risk"
+          - "ssot-code-issue-mismatch"
+
+    # =========================
+    # 3. >> fix : 不具合修正
+    # =========================
+    - id: "fix"
+      tag: ">> fix"
+      label: "不具合修正"
+      description: >
+        SSOTと実装の差分を分析し、原因特定と修正を行うモード。
+        症状ベースで原因を掘り下げ、再発防止メモまで含める。
+      defaultWorkflowId: "bugfix_flow"
+      defaultMode: "strict"
+      requiredIntegrations:
+        - "ssot"
+        - "plane"
+        - "logs"
+        - "governance"
+      inputs:
+        - name: "issue_id"
+          required: true
+          description: "Plane のバグIssue番号"
+        - name: "symptom"
+          required: true
+          description: "再現手順やエラーメッセージ等の症状情報"
+        - name: "ssot_id"
+          required: false
+          description: "関連しそうなSSOT ID（わかれば）"
+      outputExpectations:
+        - "原因分析レポート（どこが悪かったか）"
+        - "修正内容の要約・変更ファイル一覧"
+        - "再発防止メモ（チェックリスト・ガイドライン案）"
+      governanceProfile:
+        useHaltProtocol: true
+        haltTriggers:
+          - "cause-not-found-over-time"
+          - "ssot-code-issue-mismatch"
+
+    # =========================
+    # 4. >> rfv : 実装検証／レビュー
+    # =========================
+    - id: "rfv"
+      tag: ">> rfv"
+      label: "実装検証・レビュー"
+      description: >
+        既存の実装やプロンプト、SSOTに対してレビュー／検証を行うモード。
+        「仕様どおりか」「ガバナンスに反していないか」を中心にチェックする。
+      defaultWorkflowId: "web_review_prompt_or_ssot"
+      defaultMode: "strict"
+      requiredIntegrations:
+        - "ssot"
+        - "repo"
+        - "governance"
+      inputs:
+        - name: "target"
+          required: true
+          description: "レビュー対象（例: prompt / ssot / implementation など）"
+        - name: "context"
+          required: false
+          description: "Issue番号や関連SSOT、想定ユースケース等"
+      outputExpectations:
+        - "レビューコメント一覧"
+        - "問題点の指摘と提案修正方針"
+      governanceProfile:
+        useHaltProtocol: true
+        haltTriggers:
+          - "system-boundary-violation"
+          - "tenant-isolation-risk"
+
+    # =========================
+    # 5. >> next : 次タスク選定
+    # =========================
+    - id: "next"
+      tag: ">> next"
+      label: "次タスク選定"
+      description: >
+        Plane から次に着手すべき Issue 候補を列挙・推薦するモード。
+        優先度・依存関係・リスクなどを考慮した上で「次の一手」を提案する。
+      defaultWorkflowId: "select_next_task"
+      defaultMode: "fast"
+      requiredIntegrations:
+        - "plane"
+      inputs: []
+      outputExpectations:
+        - "候補Issue一覧"
+        - "各Issueの推薦理由と簡易リスク評価"
+      governanceProfile:
+        useHaltProtocol: false
+
+    # =========================
+    # 6. >> prmt : 実装プロンプト生成
+    # =========================
+    - id: "prmt"
+      tag: ">> prmt"
+      label: "実装プロンプト生成"
+      description: >
+        Issue / SSOT / governance を元に、Implementation AI 向けプロンプトを生成するモード。
+        実装AIがそのまま使える形式のプロンプト本文を構成する。
+      defaultWorkflowId: "generate_prompts"
+      defaultMode: "balanced"
+      requiredIntegrations:
+        - "ssot"
+        - "plane"
+        - "governance"
+        - "prompt_templates"
+      inputs:
+        - name: "issue_id"
+          required: true
+          description: "Plane の Issue 番号"
+        - name: "ssot_id"
+          required: false
+          description: "関連SSOT ID（わかれば）"
+      outputExpectations:
+        - "Implementation AI 用プロンプト本文（1タスク2〜3ファイル前提）"
+      governanceProfile:
+        useHaltProtocol: true
+        haltTriggers:
+          - "ssot-ambiguous"
+          - "system-boundary-violation"
+          - "tenant-isolation-risk"
+
+
+
+
+
+
+
+
+

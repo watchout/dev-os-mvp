@@ -1,0 +1,58 @@
+governance:
+  version: "1.1" # 確信レベル定義を追加
+
+  # 確信レベル（Confidence Level）定義 - 脱・バイブス指標
+  confidence_level_standards:
+    - level: 1 # Critical (Vibe Development)
+      label: "漂う開発（バイブス）"
+      description: "指示が抽象的で、AIが推測で補完せざるを得ない状態。"
+      criteria: "SSOTへの参照がない、または目的が不明確"
+      action: "halt" # 実行を強制停止
+      ui_hint: "「不」が「光」を遮っています。SSOTで仕様を整えてください。"
+
+    - level: 2 # Warning
+      label: "不透明な設計"
+      description: "方向性は見えるが、境界条件やエラーハンドリングが欠落している。"
+      criteria: "主要なエンティティは定義されているが、制約条件が不足"
+      action: "warn" # 警告を出し、改善ヒントを表示
+      ui_hint: "確信まであと一歩です。エッジケースを定義しましょう。"
+
+    - level: 3 # Success (Confidence)
+      label: "確信ある設計"
+      description: "SSOTに基づき、入出力と制約が完全に定義されている。"
+      criteria: "関連する全てのSSOTが紐付き、バリデーションが通っている"
+      action: "allow" # 実行許可
+      ui_hint: "弥栄！確かな知恵が整いました。実装を開始します。"
+
+  halt_protocol:
+    summary: "high-risk な操作や曖昧な状態での暴走を防ぐための、共通のストップ条件定義。"
+    triggers:
+      - id: "ssot-ambiguous"
+        label: "SSOTが曖昧・確定不能"
+        severity: "warning"
+        description: "要求や仕様が曖昧で、SSOTを安全に確定できない状態。"
+        recommendation: "仕様の不明点を列挙し、人間または設計AIにエスカレーションする。"
+
+      - id: "system-boundary-violation"
+        label: "システム境界違反のリスク"
+        severity: "error"
+        description: "他システムDBや認証境界など、システム境界を越える変更・アクセスを行おうとしている。"
+        recommendation: "hotel-common / 各システム境界定義を確認し、設計AIまたは人間レビューを必須とする。"
+
+      - id: "tenant-isolation-risk"
+        label: "テナント分離リスク"
+        severity: "error"
+        description: "マルチテナント前提を壊す可能性のある変更（tenant_id無視など）。"
+        recommendation: "マルチテナント設計のSSOTとschemaを確認し、変更案を分離検討する。"
+
+      - id: "ssot-code-issue-mismatch"
+        label: "SSOT / 実装 / Issue の不整合"
+        severity: "error"
+        description: "SSOT・コード・Issueのどれかが他と矛盾しており、どれを正とすべきか不明な状態。"
+        recommendation: "どれを“正”とするかを決めるまで実装を進めず、SSOT更新 or Issue再定義を優先する。"
+
+      - id: "cause-not-found-over-time"
+        label: "原因未特定のまま時間経過"
+        severity: "warning"
+        description: "一定時間（または一定試行）原因が特定できないまま調査が続いている。"
+        recommendation: "調査ログをまとめて共有し、別視点からのレビューか、切り分け再設計を依頼する。"

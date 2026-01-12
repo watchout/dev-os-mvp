@@ -1,0 +1,441 @@
+# ssot/market_analysis.yml
+# dev-OS 市場分析・競合分析 SSOT
+#
+# 目的: 日本 vs 海外のどちらに注力すべきかを決定するための分析
+# 作成日: 2026-01-03
+
+market_analysis:
+  version: "1.0"
+  created_at: "2026-01-03"
+  
+  # ===== 1. dev-OS の市場カテゴリ定義 =====
+  market_category:
+    primary: "AI開発品質管理プラットフォーム"
+    secondary:
+      - "開発者生産性ツール (Developer Productivity Tools)"
+      - "AI/LLMオーケストレーション"
+      - "仕様管理・ドキュメンテーション"
+    
+    unique_position: |
+      dev-OS は既存カテゴリに完全には収まらない「新カテゴリ」を創造している：
+      - コード生成ツール（Cursor/Copilot）ではない → 補完関係
+      - コードレビューツール（CodeRabbit）ではない → 上流の設計レイヤー
+      - ドキュメンテーションツール（Notion/Confluence）ではない → AIと連動するアクティブSSOT
+      - LLMオーケストレーション（LangChain/Dify）ではない → 開発プロセス全体のOS
+      
+      これは強みでもあり、弱みでもある：
+      - 強み: 直接競合が少ない。独自ポジションを取れる
+      - 弱み: 市場教育コストが高い。「何者なのか」を説明する必要がある
+
+  # ===== 2. 競合分析 =====
+  competitor_analysis:
+    
+    # --- 直接競合（同じ問題を解決しようとしている） ---
+    direct_competitors:
+      
+      - id: none-exact
+        name: "完全一致の競合は存在しない"
+        description: |
+          「SSOT × マルチLLM監査 × 開発プロセスOS」という組み合わせを提供する
+          競合は現時点で見当たらない。これは「ブルーオーシャン」であると同時に、
+          「市場が存在しない可能性」も示唆している。
+    
+    # --- 間接競合（一部の価値が重複） ---
+    indirect_competitors:
+      
+      # カテゴリ1: AIコーディングツール
+      ai_coding_tools:
+        relationship: "補完関係（競合ではない）"
+        note: "dev-OS は設計レイヤー、これらは実装レイヤー"
+        players:
+          - name: "GitHub Copilot"
+            market_share: "dominant"
+            pricing: "$19/user/month"
+            strength: "Microsoft/GitHub エコシステム"
+            weakness: "設計・仕様の品質管理は範囲外"
+            
+          - name: "Cursor"
+            market_share: "growing-fast"
+            pricing: "$20/user/month"
+            strength: "IDE統合、開発者体験"
+            weakness: "同上"
+            
+          - name: "Windsurf (Codeium)"
+            market_share: "challenger"
+            pricing: "$15/user/month"
+            strength: "コスト競争力"
+            weakness: "同上"
+      
+      # カテゴリ2: AIコードレビューツール
+      ai_code_review:
+        relationship: "部分競合（レビュー機能が重複）"
+        note: "dev-OS の Reviewer は仕様レベル。これらはコードレベル"
+        players:
+          - name: "CodeRabbit"
+            pricing: "$12/user/month〜"
+            strength: "PRレビュー自動化、GitHub統合"
+            weakness: "コードレベル。仕様との整合性チェックは弱い"
+            market: "主に海外"
+            
+          - name: "Sourcery"
+            pricing: "Free〜$20/user/month"
+            strength: "Python特化、リファクタリング提案"
+            weakness: "言語限定"
+            market: "海外"
+            
+          - name: "Codacy"
+            pricing: "$15/user/month〜"
+            strength: "コード品質ダッシュボード"
+            weakness: "AI機能は後発"
+            market: "海外"
+      
+      # カテゴリ3: 仕様管理・ドキュメンテーション
+      documentation_tools:
+        relationship: "代替関係（一部）"
+        note: "静的ドキュメント vs アクティブSSOT"
+        players:
+          - name: "Notion"
+            market_share: "dominant"
+            pricing: "$10/user/month〜"
+            strength: "汎用性、エコシステム"
+            weakness: "静的。AIとの連動は限定的"
+            
+          - name: "Confluence"
+            market_share: "enterprise-dominant"
+            pricing: "Atlassianバンドル"
+            strength: "Jira統合、エンタープライズ"
+            weakness: "開発者向けUXは弱い"
+            
+          - name: "GitBook"
+            pricing: "$8/user/month〜"
+            strength: "開発者向けドキュメンテーション"
+            weakness: "仕様管理機能は弱い"
+      
+      # カテゴリ4: LLMオーケストレーション
+      llm_orchestration:
+        relationship: "部分競合（マルチLLM機能が重複）"
+        note: "これらはAIアプリ構築。dev-OSは開発プロセス支援"
+        players:
+          - name: "LangChain"
+            pricing: "OSS + LangSmith有料"
+            strength: "デファクトスタンダード、エコシステム"
+            weakness: "開発者向け。非エンジニアには複雑"
+            market: "海外中心"
+            
+          - name: "Dify"
+            pricing: "OSS + Cloud有料"
+            strength: "ノーコード、GUIでのワークフロー構築"
+            weakness: "開発プロセス支援は範囲外"
+            market: "中国発、グローバル展開"
+            
+          - name: "Flowise"
+            pricing: "OSS"
+            strength: "完全OSS"
+            weakness: "商用サポートが弱い"
+
+    # --- 将来の脅威 ---
+    future_threats:
+      - id: cursor-expansion
+        name: "Cursor/Copilot の上流拡張"
+        probability: "medium-high"
+        description: "AIコーディングツールが設計・仕様管理に機能拡張する可能性"
+        mitigation: "先行者優位を確立。SSOT×ガバナンスの独自性を強化"
+        
+      - id: big-tech-entry
+        name: "BigTech（GitHub/Google/Amazon）の参入"
+        probability: "medium"
+        description: "大手が類似機能を組み込みで提供"
+        mitigation: "M&A候補として先に関係構築。買収される戦略"
+
+  # ===== 3. 市場規模分析 =====
+  market_size:
+    
+    # 全体SaaS市場
+    global_saas:
+      2024: "$399B USD (約60兆円)"
+      2030_forecast: "$819B USD (約120兆円)"
+      cagr: "12.0%"
+      
+    japan_saas:
+      2024: "¥1.4兆"
+      2028_forecast: "¥2兆"
+      cagr: "10.9%"
+      share_of_global: "2.3%"  # 日本は世界の2.3%程度
+    
+    # dev-OS のターゲット市場（TAM/SAM/SOM）
+    dev_os_market:
+      
+      tam:
+        name: "Total Addressable Market"
+        scope: "全世界の開発者向けSaaS市場"
+        size: "約$50B USD"
+        note: "非現実的に大きい数字。参考値"
+        
+      sam:
+        name: "Serviceable Addressable Market"
+        scope: "AI開発ツールを使う4-15人のSaaSチーム"
+        global_estimate: "$500M〜$1B USD"
+        japan_estimate: "¥50億〜¥100億"
+        calculation: |
+          - 世界のSaaS企業数: 約30,000社
+          - そのうち4-15人規模: 約10,000社
+          - AI開発ツール利用率: 約50%
+          - 年間予算: $10,000〜$30,000
+          = $50M〜$150M（保守的）〜$500M（楽観的）
+        
+      som:
+        name: "Serviceable Obtainable Market"
+        scope: "1年以内に獲得可能な市場"
+        japan_estimate: "¥1億〜¥3億"
+        global_estimate: "$5M〜$10M USD"
+        note: "SOM = SAM × 市場獲得率（1-3%）"
+
+  # ===== 4. 日本 vs 海外：戦略比較 =====
+  japan_vs_international:
+    
+    # --- 日本市場の特徴 ---
+    japan:
+      market_size: "¥1.4兆（世界の2.3%）"
+      growth_rate: "10.9% CAGR"
+      
+      advantages:
+        - id: jp-adv-1
+          name: "言語・文化の障壁がない"
+          description: "ネイティブ言語でマーケティング・サポートが可能"
+          impact: "high"
+          
+        - id: jp-adv-2
+          name: "低いチャーン率"
+          description: "日本企業は一度導入すると継続利用する傾向が強い"
+          impact: "high"
+          source: "All Star SaaS Fund調査"
+          
+        - id: jp-adv-3
+          name: "ネットワーク効果"
+          description: "創業者の既存ネットワーク（IYASAKA関連）を活用可能"
+          impact: "medium-high"
+          
+        - id: jp-adv-4
+          name: "買収候補との距離"
+          description: "freee/マネーフォワード等に直接アプローチしやすい"
+          impact: "medium"
+          
+        - id: jp-adv-5
+          name: "競合の少なさ"
+          description: "日本語で同じ価値を提供する競合は皆無"
+          impact: "very-high"
+      
+      disadvantages:
+        - id: jp-dis-1
+          name: "市場規模が小さい"
+          description: "世界の2.3%。ARR上限が低い"
+          impact: "high"
+          
+        - id: jp-dis-2
+          name: "導入スピードが遅い"
+          description: "日本企業の意思決定は時間がかかる"
+          impact: "medium-high"
+          
+        - id: jp-dis-3
+          name: "PLGが効きにくい"
+          description: "日本のB2Bは関係性・信頼ベース。セルフサーブは弱い"
+          impact: "high"
+          
+        - id: jp-dis-4
+          name: "M&A価格が安い"
+          description: "日本のM&A倍率は海外より低い傾向"
+          impact: "medium"
+    
+    # --- 海外市場の特徴 ---
+    international:
+      market_size: "$399B USD（約60兆円）"
+      growth_rate: "12.0% CAGR"
+      
+      advantages:
+        - id: int-adv-1
+          name: "市場規模が圧倒的に大きい"
+          description: "日本の約40倍。ARR上限が高い"
+          impact: "very-high"
+          
+        - id: int-adv-2
+          name: "PLGが機能する"
+          description: "Product Hunt/Hacker News経由のセルフサーブ獲得"
+          impact: "high"
+          
+        - id: int-adv-3
+          name: "M&A倍率が高い"
+          description: "AI/DevTools は10倍以上のマルチプルも"
+          impact: "high"
+          
+        - id: int-adv-4
+          name: "買収候補が多い"
+          description: "Atlassian/JetBrains/GitHub/GitLab等"
+          impact: "high"
+          
+        - id: int-adv-5
+          name: "売買マーケットプレイスが充実"
+          description: "Acquire.com等でセルフサービスM&Aが可能"
+          impact: "medium-high"
+      
+      disadvantages:
+        - id: int-dis-1
+          name: "競争が激しい"
+          description: "類似ツールが無数に存在。差別化が困難"
+          impact: "very-high"
+          
+        - id: int-dis-2
+          name: "言語・文化の障壁"
+          description: "英語でのマーケティング・サポートが必要"
+          impact: "high"
+          
+        - id: int-dis-3
+          name: "信頼構築が困難"
+          description: "無名の日本スタートアップは信頼されにくい"
+          impact: "high"
+          
+        - id: int-dis-4
+          name: "サポートコストが高い"
+          description: "時差対応、多言語サポート"
+          impact: "medium"
+          
+        - id: int-dis-5
+          name: "法規制・税務の複雑さ"
+          description: "GDPR、米国税制等への対応"
+          impact: "medium"
+
+  # ===== 5. 戦略オプション分析 =====
+  strategic_options:
+    
+    option_a:
+      name: "日本集中戦略"
+      description: "日本市場のみに注力し、日本企業へのM&Aを目指す"
+      
+      pros:
+        - "リソース集中によるスピード"
+        - "言語・文化の障壁なし"
+        - "創業者ネットワーク活用"
+        - "freee/マネーフォワードへの直接アプローチ"
+      
+      cons:
+        - "市場規模の上限が低い（ARR 2-3億円が限界）"
+        - "買収候補が限定的"
+        - "M&A倍率が低い"
+      
+      required_arr_for_1b_exit: "¥1,500万〜¥2,000万（7倍マルチプル）"
+      feasibility: "medium-high"
+      timeline_fit: "12ヶ月に収まる"
+    
+    option_b:
+      name: "海外先行戦略"
+      description: "最初から海外市場（主に北米）に注力"
+      
+      pros:
+        - "市場規模が大きい"
+        - "高いM&A倍率"
+        - "買収候補が多い"
+      
+      cons:
+        - "競争が激しい"
+        - "言語・文化の障壁"
+        - "信頼構築に時間がかかる"
+        - "創業者ネットワークが活かせない"
+      
+      required_arr_for_1b_exit: "$100K〜$150K（10倍マルチプル、$660K = 1億円）"
+      feasibility: "low-medium"
+      timeline_fit: "12ヶ月では厳しい"
+    
+    option_c:
+      name: "日本先行・海外後追い戦略"
+      description: "まず日本で基盤を作り、後から海外展開"
+      
+      pros:
+        - "リスク分散"
+        - "日本での成功事例を海外展開の材料に"
+      
+      cons:
+        - "リソースが分散"
+        - "海外展開が遅れる"
+        - "1年では両方は難しい"
+      
+      feasibility: "medium"
+      timeline_fit: "12ヶ月では日本止まり"
+    
+    option_d:
+      name: "日本主軸・海外シグナリング戦略 ★推奨★"
+      description: |
+        日本市場で売上を作りながら、海外には「シグナル」を送る。
+        売上は日本、買収候補は日本+海外の両方を狙う。
+      
+      execution:
+        japan:
+          - "売上の90%を日本で獲得"
+          - "日本語でのマーケティング・サポート"
+          - "freee/マネーフォワード/LayerXへのアプローチ"
+        international:
+          - "英語LP・ドキュメントの準備"
+          - "Product Hunt ローンチ（認知目的）"
+          - "Atlassian/JetBrains Marketplace への連携公開"
+          - "Acquire.com へのリスティング（Month 9以降）"
+      
+      pros:
+        - "日本で確実に売上を作れる"
+        - "海外買収候補にも認知される"
+        - "リソース配分が現実的"
+        - "どちらの買収候補にも対応可能"
+      
+      cons:
+        - "海外売上は期待できない"
+        - "Product Huntは1回しか打てない"
+      
+      required_arr_for_1b_exit: "¥1,200万〜¥1,500万（日本売上）+ 海外認知"
+      feasibility: "high"
+      timeline_fit: "12ヶ月で実現可能"
+
+  # ===== 6. 結論と推奨 =====
+  conclusion:
+    
+    recommended_strategy: "option_d"
+    name: "日本主軸・海外シグナリング戦略"
+    
+    rationale: |
+      1. 【市場規模】日本市場は小さいが、1億円Exitには十分
+         - 必要ARR: ¥1,500万（MRR ¥125万）
+         - 日本市場のSOM（獲得可能市場）は ¥1億〜¥3億
+         - 十分に達成可能な規模
+      
+      2. 【競合優位】日本では直接競合がゼロ
+         - 同じ価値を日本語で提供する競合は存在しない
+         - 海外は CodeRabbit/LangChain 等がひしめく激戦区
+      
+      3. 【スピード】日本の方が早く売上が立つ
+         - 創業者ネットワークを活用した紹介獲得
+         - 言語・文化の障壁なし
+         - 12ヶ月という短期間に適合
+      
+      4. 【M&A候補】日本+海外の両方を狙える
+         - 日本売上があれば、freee/マネーフォワードにアプローチ可能
+         - 英語LP/Product Huntで海外候補にも認知される
+         - Acquire.comリスティングで海外バイヤーにもリーチ
+      
+      5. 【リスク分散】日本で売上を確保しつつ、海外オプションも残す
+         - 日本の買収候補がダメでも、海外候補がある
+         - 逆もまた然り
+    
+    key_metrics:
+      sales_focus: "90% 日本 / 10% 海外"
+      marketing_focus: "70% 日本 / 30% 海外（認知目的）"
+      support_language: "日本語優先、英語は最低限"
+      m_and_a_candidates: "日本 5社 + 海外 5社 + Acquire.com"
+    
+    action_items:
+      immediate:
+        - "日本語でのマーケティングに集中（Zenn/Twitter/カンファレンス）"
+        - "創業者ネットワークを活用した紹介獲得"
+        - "英語LP・README の準備"
+      month_3_4:
+        - "Product Hunt ローンチ（認知目的）"
+        - "Atlassian/JetBrains Marketplace 連携"
+      month_9:
+        - "Acquire.com リスティング"
+        - "海外買収候補へのアプローチ開始"
+

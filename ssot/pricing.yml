@@ -1,0 +1,249 @@
+# ssot/pricing.yml
+# dev-OS 料金プラン定義 - LTV最大化を考慮した設計
+#
+# 変更履歴:
+#   2026-01-02: 初版作成（マーケティング監修レポートに基づく）
+#   - 5段階→4段階に統合
+#   - 無料プラン追加（PLG必須）
+#   - 価格帯を市場に合わせて調整
+
+pricing:
+  version: "2.0"
+  effective_date: "2026-01-02"
+  currency: "JPY"
+  tax_type: "exclusive"  # 税別表示
+
+  # ===== 設計原則 =====
+  design_principles:
+    - id: plg-first
+      name: "PLGファースト"
+      description: "無料で始められることがB2B DevToolsの命"
+    
+    - id: clear-value-ladder
+      name: "明確な価値階段"
+      description: "各プラン間の価値差分が一目で分かる"
+    
+    - id: seat-based-expansion
+      name: "シートベース拡張"
+      description: "チームプランはユーザー数で収益が伸びる設計"
+    
+    - id: sticky-value
+      name: "累積価値"
+      description: "使うほどSSOTが資産化し、離脱コストが上がる"
+
+  # ===== プラン定義 =====
+  plans:
+
+    - id: free
+      name: "Free"
+      slug: "free"
+      tagline: "まずは触ってみる"
+      description: "個人開発者・評価目的向けの無料プラン"
+      target_persona: "secondary-indie-yuki"
+      
+      pricing:
+        monthly: 0
+        annual: 0
+        billing_type: "free"
+      
+      limits:
+        users: 1
+        workspaces: 1
+        workflow_executions_per_month: 10
+        ssot_files: 5
+        execution_log_retention_days: 7
+        api_key_slots: 1
+      
+      features:
+        included:
+          - "SSOT管理（YAML）"
+          - "selfcheck CLI"
+          - "Drafter実行（月10回）"
+          - "BYO APIキー（1つ）"
+          - "コミュニティサポート（Discord）"
+        excluded:
+          - "Reviewer / Refiner"
+          - "チームメンバー追加"
+          - "Linear/Plane連携"
+          - "SSOT履歴"
+          - "優先サポート"
+      
+      cta:
+        text: "無料で始める"
+        style: "secondary"
+        urgency: null
+      
+      conversion_goal: "Proへのアップグレード"
+
+    - id: pro
+      name: "Pro"
+      slug: "pro"
+      tagline: "本気の個人開発に"
+      description: "個人開発者・フリーランス向けのプロプラン"
+      target_persona: "secondary-indie-yuki"
+      
+      pricing:
+        monthly: 4980
+        annual: 49800  # 2ヶ月分お得
+        billing_type: "subscription"
+        annual_discount_months: 2
+      
+      limits:
+        users: 1
+        workspaces: 3
+        workflow_executions_per_month: null  # 無制限
+        ssot_files: null  # 無制限
+        execution_log_retention_days: 30
+        api_key_slots: 3
+      
+      features:
+        included:
+          - "Freeの全機能"
+          - "無制限ワークフロー実行"
+          - "Reviewer / Refiner"
+          - "BYO APIキー（3つ）"
+          - "メールサポート"
+        excluded:
+          - "チームメンバー追加"
+          - "Linear/Plane連携"
+          - "SSOT履歴"
+          - "優先サポート"
+      
+      cta:
+        text: "Proを始める"
+        style: "primary"
+        urgency: null
+      
+      conversion_goal: "Teamへのアップグレード（チーム化時）"
+
+    - id: team
+      name: "Team"
+      slug: "team"
+      tagline: "チームで品質を統一"
+      description: "4〜15人のチーム向け。シートライセンス方式。"
+      target_persona: "primary-cto-takashi"
+      featured: true  # おすすめバッジ表示
+      
+      pricing:
+        monthly: 29800
+        annual: 298000  # 2ヶ月分お得
+        billing_type: "subscription"
+        annual_discount_months: 2
+        additional_seat:
+          monthly: 5980
+          annual: 59800
+        included_seats: 5
+      
+      limits:
+        users: 5  # 基本シート数（追加可能）
+        users_max: 15
+        workspaces: 10
+        workflow_executions_per_month: null  # 無制限
+        ssot_files: null  # 無制限
+        execution_log_retention_days: 90
+        api_key_slots: 10
+      
+      features:
+        included:
+          - "Proの全機能"
+          - "チームメンバー管理"
+          - "ロール・権限管理"
+          - "Linear / Plane連携"
+          - "SSOT変更履歴（90日）"
+          - "チームダッシュボード"
+          - "優先メールサポート"
+        excluded:
+          - "SSO / SAML"
+          - "専用インフラ"
+          - "SLA保証"
+          - "カスタム連携"
+      
+      cta:
+        text: "チームで始める"
+        style: "primary"
+        urgency: "おすすめ"
+      
+      conversion_goal: "Enterprise商談（セキュリティ要件時）"
+
+    - id: enterprise
+      name: "Enterprise"
+      slug: "enterprise"
+      tagline: "企業レベルのガバナンス"
+      description: "20人以上 or セキュリティ要件が厳しい企業向け"
+      target_persona: "tertiary-agency-kenji"
+      
+      pricing:
+        monthly: 200000  # 最低価格（個別見積もり）
+        annual: 2000000
+        billing_type: "invoice"  # 請求書払い
+        note: "要件に応じて個別見積もり"
+      
+      limits:
+        users: null  # 無制限（契約による）
+        workspaces: null  # 無制限
+        workflow_executions_per_month: null
+        ssot_files: null
+        execution_log_retention_days: 365
+        api_key_slots: null
+      
+      features:
+        included:
+          - "Teamの全機能"
+          - "SSO / SAML対応"
+          - "専用インフラ（オプション）"
+          - "SLA保証（99.9%）"
+          - "カスタム連携開発"
+          - "専任カスタマーサクセス"
+          - "オンボーディング支援"
+          - "監査ログ永久保存"
+        excluded: []
+      
+      cta:
+        text: "お問い合わせ"
+        style: "secondary"
+        urgency: null
+      
+      conversion_goal: "長期契約・年間一括払い"
+
+  # ===== 旧プランからの移行マッピング =====
+  migration_from_v1:
+    solo: "pro"      # Solo → Pro（価格ダウンで移行しやすく）
+    starter: "team"  # Starter → Team（機能拡充）
+    growth: "team"   # Growth → Team（価格ダウン）
+    studio: "enterprise"  # Studio → Enterprise
+    enterprise: "enterprise"
+
+  # ===== LTV設計メモ =====
+  ltv_strategy:
+    free_to_pro:
+      target_conversion_rate: 0.05  # 5%
+      average_time_to_convert_days: 30
+      key_trigger: "月10回のワークフロー上限到達"
+    
+    pro_to_team:
+      target_conversion_rate: 0.15  # 15%
+      average_time_to_convert_days: 90
+      key_trigger: "チームメンバーと共有したくなった時"
+    
+    team_to_enterprise:
+      target_conversion_rate: 0.10  # 10%
+      average_time_to_convert_days: 180
+      key_trigger: "SSO要件 or セキュリティ監査対応"
+    
+    churn_reduction:
+      - "SSOT累積価値：使うほど仕様資産が溜まり離脱コストが上がる"
+      - "Execution Log：チームの知恵として蓄積"
+      - "Weekly Digest：毎週の生産性レポートでエンゲージメント維持"
+
+  # ===== 競合価格比較（参考） =====
+  competitive_reference:
+    - name: "Linear"
+      pricing: "$8/user/month (Team)"
+      note: "タスク管理SaaS。dev-OSはより上流の価値"
+    - name: "Notion"
+      pricing: "$10/user/month (Team)"
+      note: "ドキュメント管理。静的 vs アクティブSSOT"
+    - name: "GitHub Copilot Business"
+      pricing: "$19/user/month"
+      note: "コード補完。dev-OSは設計レイヤー"
+

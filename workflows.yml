@@ -1,0 +1,243 @@
+workflows:
+  - id: create_ssot
+    featureId: ssot-management
+    name: "SSOT作成フロー（技術×マーケ共創）"
+    description: "マーケティング視点での市場適合性と、技術的整合性を両立したSSOTを定義するフロー。"
+    modes:
+      fast:
+        description: "Drafter + Marketer で迅速に方向性を決めるモード。"
+      balanced:
+        description: "Marketer(分析) -> Drafter(草案) -> Reviewer(監査) -> Refiner(統合) の標準フロー。"
+      strict:
+        description: "複数の Marketer による多角的な市場検証を含む品質重視モード。"
+    steps:
+      - order: 1
+        role: "marketer"
+        modelSlot: "marketer"
+        input: "requirements + personas + strategy"
+        output: "marketing_alignment_note"
+        notes: "技術的な設計の前に、ペルソナのペインに合致しているか、市場価値があるかを検証する。"
+      - order: 2
+        role: "drafter"
+        modelSlot: "drafter"
+        input: "requirements + marketing_alignment_note"
+        output: "ssot_draft"
+        notes: "マーケティングの合意事項を踏まえた技術仕様のたたき台を生成する。"
+      - order: 3
+        role: "reviewer"
+        modelSlot: "reviewer"
+        input: "ssot_draft"
+        output: "review_notes"
+        notes: "技術的整合性と、マーケティング要件の漏れをダブルチェックする。"
+      - order: 4
+        role: "refiner"
+        modelSlot: "drafter"
+        input: "ssot_draft + review_notes + marketing_alignment_note"
+        output: "ssot_final"
+        notes: "全ての指摘を統合し、確信を持てる最終案を生成する。"
+
+  - id: generate_prompts
+    featureId: cursor-prompt-generation
+    ragProfileId: impl_single_task_v1
+    name: "実装プロンプト生成フロー"
+    description: "SSOTとタスク定義から、実装AI向けプロンプトを生成するフロー。"
+    modes:
+      fast:
+        description: "小さなタスク向けの簡易プロンプト生成。"
+      balanced:
+        description: "SSOT参照＋レビューチェック付きの標準プロンプト生成。"
+      strict:
+        description: "重要タスク向け。禁止事項や品質ゲートを厚めに含める。"
+    steps:
+      - order: 1
+        role: "drafter"
+        modelSlot: "drafter"
+        input: "task_definition + ssot_snippets"
+        output: "prompt_draft"
+        notes: "関連SSOTの抜粋とタスク定義をもとに、実装AI用プロンプト案を作る。"
+      - order: 2
+        role: "reviewer"
+        modelSlot: "reviewer"
+        input: "prompt_draft"
+        output: "prompt_review_notes"
+        notes: "あいまいさ・抜け漏れ・禁止事項などを指摘する。"
+      - order: 3
+        role: "refiner"
+        modelSlot: "drafter"
+        input: "prompt_draft + prompt_review_notes"
+        output: "prompt_final"
+        notes: "レビューを反映した最終版プロンプトを生成する。"
+
+  - id: check
+    name: "開発チェックフロー"
+    description: "TypeScript 型チェックやテストなど、マージ前に通すべきチェックを定義するフロー。"
+    modes:
+      fast:
+        description: "ローカル開発用の軽めチェック。"
+      balanced:
+        description: "PR向けの標準チェック。"
+      strict:
+        description: "リリース前などのフルチェック。"
+    steps:
+      - order: 1
+        role: "runner"
+        modelSlot: "light"
+        input: "tsc --noEmit"
+        output: "typecheck_result"
+        notes: "TypeScript の型チェックを行う。"
+      - order: 2
+        role: "runner"
+        modelSlot: "light"
+        input: "npm test"
+        output: "test_result"
+        notes: "ユニットテストを実行する（現時点ではダミー想定でも可）。"
+
+  - id: web_review_prompt_or_ssot
+    name: "Prompt / SSOT レビューフロー（Webコンソール用）"
+    description: "既存のプロンプトやSSOT(YAML)を複数LLMでレビューし、問題点リストと修正版案を生成するフロー。"
+    modes:
+      fast:
+        description: "ドラフトレビューのみの軽量チェック（Reviewer 1回）。"
+      balanced:
+        description: "Reviewer + Refiner で標準的なレビュー＆修正版生成。"
+      strict:
+        description: "重要な仕様向け。Reviewerを2回使うなど、将来拡張前提の品質重視モード。"
+    steps:
+      - order: 1
+        role: "reviewer"
+        modelSlot: "reviewer"
+        input: "target_text"
+        output: "review_notes"
+        notes: "曖昧さ・整合性・抜け漏れ・LLM安全性などの観点から問題点リストを出す。"
+
+      - order: 2
+        role: "refiner"
+        modelSlot: "drafter"
+        input: "target_text + review_notes"
+        output: "revised_text"
+        notes: "元のテキストと review_notes を踏まえて、修正版案を出力する。"
+
+  - id: impl_feature
+    featureId: ssot-management
+    name: "SSOT実装フロー"
+    description: "既存SSOTとPlane Issueをもとに、2〜3ファイルの実装タスクを安全に完了させるフロー。"
+    modes:
+      fast:
+        description: "小さな修正向けの簡易プラン生成（Drafter中心）。"
+      balanced:
+        description: "Drafter / Reviewer / Refiner を一通り通す標準実装フロー。"
+      strict:
+        description: "high-riskなfeature向け。レビューチェックを厚めに行う。"
+    steps:
+      - order: 1
+        role: "drafter"
+        modelSlot: "drafter"
+        input: "ssot + issue + repo_context"
+        output: "impl_plan"
+        notes: "SSOTとPlane Issue、既存コードから、2〜3ファイルに収まる実装プランを作る。"
+      - order: 2
+        role: "reviewer"
+        modelSlot: "reviewer"
+        input: "impl_plan"
+        output: "impl_review_notes"
+        notes: "system-boundary / tenant-isolation / ssot整合性の観点でプランをレビューする。"
+      - order: 3
+        role: "refiner"
+        modelSlot: "drafter"
+        input: "impl_plan + impl_review_notes"
+        output: "impl_plan_final"
+        notes: "レビュー結果を反映し、Implementation AIに渡す最終的な実装手順・注意点を整形する。"
+
+  - id: bugfix_flow
+    # featureId: bugfix-management
+    name: "バグ修正フロー"
+    description: "症状・ログ・SSOTから原因を特定し、小さな修正タスクに落とし込むフロー。"
+    modes:
+      fast:
+        description: "軽微な不具合向けの簡易原因分析＋修正方針提示。"
+      balanced:
+        description: "原因分析 → 修正プラン → 再発防止メモまで含める標準バグ修正フロー。"
+      strict:
+        description: "障害クラスの不具合向け。原因特定と再発防止策を厚めに検討する。"
+    steps:
+      - order: 1
+        role: "drafter"
+        modelSlot: "drafter"
+        input: "issue + symptom + logs + ssot"
+        output: "bug_hypotheses"
+        notes: "症状・ログ・SSOTから原因候補を列挙し、仮説リストを作る。"
+      - order: 2
+        role: "reviewer"
+        modelSlot: "reviewer"
+        input: "bug_hypotheses"
+        output: "bugfix_review_notes"
+        notes: "仮説の妥当性や見落としをチェックし、追加調査や注意点をコメントする。"
+      - order: 3
+        role: "refiner"
+        modelSlot: "drafter"
+        input: "bug_hypotheses + bugfix_review_notes"
+        output: "bugfix_plan"
+        notes: "最も有力な原因＋修正方針を整理し、実装ステップと再発防止メモをまとめる。"
+
+  - id: select_next_task
+    # featureId: task-selection
+    name: "次タスク選定フロー"
+    description: "PlaneのIssue一覧から、次に着手すべきIssue候補を選定するフロー。"
+    modes:
+      fast:
+        description: "ドラフト用。優先度・状態から機械的に候補Issueを出す。"
+      balanced:
+        description: "依存関係やリスクも加味した上で、次の一手を提案する標準モード。"
+      strict:
+        description: "リリース前などで優先度判断を慎重に行うモード（将来拡張前提）。"
+    steps:
+      - order: 1
+        role: "drafter"
+        modelSlot: "light"
+        input: "plane_issues"
+        output: "next_task_candidates"
+        notes: "PlaneのIssue一覧から、着手候補をスコアリングして上位候補リストを作る。"
+      - order: 2
+        role: "reviewer"
+        modelSlot: "light"
+        input: "next_task_candidates"
+        output: "next_task_explained"
+        notes: "それぞれの候補Issueについて、推薦理由と簡易リスク評価コメントを付与する。"
+
+  - id: kickoff_discovery
+    # ... (既存のフローは維持) ...
+    steps:
+      - order: 1
+        # ...
+      - order: 4
+        # ...
+
+  - id: generate_marketing_content
+    featureId: kickoff-strategy-analysis
+    name: "マーケティングコンテンツ生成フロー"
+    description: "SSOTと運用スケジュールに基づき、IYASAKAの体温を持った各プラットフォーム向け投稿案を生成するフロー。"
+    modes:
+      balanced:
+        description: "Namiによる戦略整合とSunによるUX/体温重視の原稿作成。"
+    steps:
+      - order: 1
+        role: "strategy_designer" # Nami
+        modelSlot: "strategy_designer"
+        input: "ssot/marketing.yml + ssot/content_schedule.yml + theme"
+        output: "content_strategy_alignment"
+        notes: "週次テーマに基づき、投稿の目的（Type1-3）とブランド戦略の整合性を確認する。"
+      - order: 2
+        role: "brand_guardian" # Sun
+        modelSlot: "brand_guardian"
+        input: "content_strategy_alignment + ssot/personas.yml"
+        output: "draft_manuscript"
+        notes: "戦略に基づき、IYASAKAの体温を感じさせる具体的な原稿（X/Note/Zenn）を作成する。"
+      - order: 3
+        role: "market_analyst" # Izaによる最終監査
+        modelSlot: "market_analyst"
+        input: "draft_manuscript"
+        output: "final_manuscript + audit_report"
+        notes: "未実装機能の過剰訴求がないか（ガバナンス）、アルゴリズムへの適合性はどうかを最終監査する。"
+
+
+

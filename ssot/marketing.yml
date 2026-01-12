@@ -1,0 +1,401 @@
+# ssot/marketing.yml
+# dev-OS マーケティング戦略 SSOT
+#
+# 変更履歴:
+#   2026-01-02: 初版作成（マーケティング監修レポートに基づく）
+#   2026-01-03: リサーチ検証済みチャネル戦略に更新
+#              LinkedIn営業削除、X/note/Zenn発信を優先化
+#              詳細ユーザー獲得戦略 → ssot/user_acquisition.yml 参照
+
+marketing:
+  version: "2.0"
+  last_updated: "2026-01-03"
+
+  # ===== 1. ポジショニング =====
+  positioning:
+    current:
+      tagline: "AI開発の「不透明」を「確信」へと変換する"
+      problem: "広すぎる。カテゴリー創造型で市場教育コストが高い"
+    
+    recommended:
+      tagline: "バイブコーディング、そろそろ限界じゃないですか？"
+      sub_tagline: "「なんとなく」で作ると「なんとなく」のものしかできない。仕様を整えれば、AIはあなたの意図を理解する。"
+      category: "AI開発品質管理プラットフォーム"
+      
+    alternative_taglines:
+      - "「いい感じに作って」→「また違う...」のループを終わらせる"
+      - "AIで作ったコード、結局自分で直してませんか？"
+      - "なんとなくで作ると、なんとなくのものしかできない"
+      
+    differentiation:
+      vs_cursor: "競合ではなく補完関係。Cursorは実装、dev-OSは設計の正本化"
+      vs_notion: "静的ドキュメント vs アクティブSSOT（AIと連動）"
+      vs_dify: "ノーコードAIアプリ構築 vs 開発プロセスのOS化"
+      vs_linear: "タスク管理 vs 仕様→タスク→プロンプトの一気通貫"
+    
+    niche_first_strategy:
+      phase1:
+        target: "Cursor + Linear/Plane で開発している4〜10人のSaaSチーム"
+        scope: "狭く深く支配"
+      phase2:
+        target: "AI開発で本番品質に苦労している開発者全般"
+        scope: "徐々に拡大"
+
+  # ===== 2. メッセージング =====
+  messaging:
+    
+    hero:
+      headline: "バイブコーディング、そろそろ限界じゃないですか？"
+      subheadline: >
+        「なんとなく」で作ると「なんとなく」のものしかできない。
+        仕様を整えれば、AIはあなたの意図を理解する。
+      
+    value_propositions:
+      - id: vp1
+        headline: "「曖昧な仕様」を許さない仕組み"
+        description: "仕様をYAMLで構造化し、曖昧さ・境界違反は自動で停止＆報告"
+        pain_solved: ["結果がブレる", "セキュリティ", "要件抜け"]
+      
+      - id: vp2
+        headline: "毎回同じ品質でAIを動かせる"
+        description: "タグ1つでワークフロー起動。コンテキスト・テンプレートが固定されるから結果がブレない"
+        pain_solved: ["結果がブレる", "品質の不安定"]
+      
+      - id: vp3
+        headline: "AIが出したコードを別のAIがレビュー"
+        description: "叩き台生成→リスクレビュー→整形の多段LLM。穴を見逃さない"
+        pain_solved: ["本番品質", "デバッグ沼"]
+    
+    pain_messaging:
+      # ペイン優先度順（2026-01-03更新: バイブコーディング問題を最優先に）
+      - rank: 1
+        headline: "「バイブコーディングでは、作りたいものが作れない」"
+        quote: "感覚でプロンプトを打つと、最初は速いが、複雑になるとAIが迷走して修正不能になる"
+        solution_preview: "→ 仕様を整えれば、AIはあなたの意図を理解する。「なんとなく」から「確信」へ"
+        keywords: ["バイブコーディング", "Vibe Coding", "意図が伝わらない"]
+      
+      - rank: 2
+        headline: "「AIに任せると、直すのに結局自分が入らないといけない」"
+        quote: "結局、AIが書いたコードのレビューと修正に1日の半分使ってる"
+        solution_preview: "→ 多重監査でAIがAIをチェック。人間の手直し工数を削減"
+        keywords: ["手直し", "修正", "レビュー"]
+      
+      - rank: 3
+        headline: "「メンバーにAI使わせると、品質がバラバラになる」"
+        quote: "人によってプロンプトの書き方が違いすぎて、コードレビューが地獄"
+        solution_preview: "→ タグ1つでワークフロー起動。誰が使っても同じ品質"
+        keywords: ["品質", "バラバラ", "チーム"]
+      
+      - rank: 4
+        headline: "「仕様が頭の中にしかなくて、引き継ぎや拡張が怖い」"
+        quote: "新しい人が入っても、仕様説明に丸1日かかる"
+        solution_preview: "→ SSOTで仕様を正本化。誰でも同じ理解が得られる"
+        keywords: ["仕様", "引き継ぎ", "属人化"]
+
+  # ===== 3. LP改善計画 =====
+  lp_improvements:
+    
+    priority: "high"
+    
+    hero_section:
+      current_problem: "「確信」「整える」は抽象的で具体的ベネフィットが見えない"
+      recommended_changes:
+        - "ヘッドラインを具体的ペイン訴求に変更"
+        - "CTAを階層化（無料で試す / 仕組みを見る）"
+        - "デモ動画 or GIFアニメーションを追加"
+    
+    cta_hierarchy:
+      current_problem: "全CTAが「相談する」に集約。今すぐ客向けの導線がない"
+      recommended_structure:
+        - level: "今すぐ客"
+          cta: "無料で試す"
+          destination: "/register"
+          style: "primary"
+        - level: "検討中"
+          cta: "デモを予約"
+          destination: "https://calendly.com/iyasaka/dev-os-demo"
+          style: "secondary"
+        - level: "情報収集"
+          cta: "導入事例を見る"
+          destination: "/cases"
+          style: "text-link"
+    
+    missing_elements:
+      - id: demo-video
+        description: "製品デモ動画（2-3分）"
+        priority: "high"
+        placement: "ヒーローセクション下部"
+      
+      - id: social-proof
+        description: "導入事例・Before/After"
+        priority: "high"
+        placement: "ソリューションセクション下部"
+      
+      - id: free-trial-cta
+        description: "無料トライアル誘導バナー"
+        priority: "critical"
+        placement: "全セクションのCTAを差し替え"
+      
+      - id: faq
+        description: "よくある質問セクション"
+        priority: "medium"
+        placement: "料金セクション下部"
+
+  # ===== 4. コンテンツ戦略（リサーチ検証済み優先順位） =====
+  # 詳細: ssot/user_acquisition.yml 参照
+  content_strategy:
+    
+    # プラットフォーム横断・循環戦略（2026-01-04更新）
+    cross_platform_strategy:
+      core_concept: "実利（効率化）× 思想（共創）× Build in Public"
+      funnel:
+        awareness: "X (フロー情報 / 1日3〜5回 / 認知・拡散)"
+        trust_logic: "Zenn (ストック情報 / 週1回 / 技術的信頼・エンジニア層)"
+        trust_emotion: "note (ストック情報 / 週1回 / 共感・思想・CTO層)"
+        conversion: "LP (成約 / 無料登録・デモ予約)"
+      key_loop: "Zenn/noteで深い価値を提示 → Xでそのエッセンスを拡散 → Xの反応をnote/Zennへフィードバック"
+      campaigns:
+        - id: vibe-coding-limit
+          theme: "バイブコーディング、そろそろ限界じゃないですか？"
+          tactic: "Before/After による圧倒的実証（AIの迷走 vs SSOTによる確信）"
+          kpi: "LP流入数 / Free登録率"
+      optimal_frequency:
+        regular_posts: "1日3〜5回（1〜2時間の間隔を空ける）"
+        threads: "週1〜2本（深い解説用）"
+      golden_hours:
+        morning: "9:00 - 11:00（通勤・始業。アルゴリズムによる10%の表示優遇あり）"
+        night: "19:00 - 21:00（退勤後・ゴールデンタイム。同様に10%優遇）"
+        stable: "6:00 / 21:00（エンゲージメントの安定期）"
+      best_days: "火曜日 〜 木曜日"
+      key_tactics:
+        - "Before/After による圧倒的実証（AIの迷走 vs SSOTによる確信）"
+        - "開発プロセスの透明化（UI・ログのチラ見せによる期待感醸成）"
+        - "noteでの深掘り記事による『思想のストック』と X での『情報のフロー』の連携"
+    
+    # リサーチ結果に基づく優先順位
+    research_insight: |
+      日本エンジニアの情報収集チャネル利用率:
+      - 検索エンジン（Google）: 71.3%
+      - YouTube: 53.9%
+      - 生成AIツール（ChatGPT等）: 28.7%
+      - SNS（X/Instagram）: 20代で高い利用率
+      
+      ツール発見のきっかけ:
+      - Xでバズっているのを見る
+      - Zenn/Qiita/noteの技術記事で知る
+      - 同僚・知人からの紹介
+    
+    channels:
+      - id: twitter
+        name: "X（Twitter）"
+        priority: 1
+        purpose: "バズの起点 & Build in Public"
+        frequency: "毎日1-3ツイート"
+        content_types:
+          - "Build in Public（開発過程共有）"
+          - "バズ狙い投稿（ペイン訴求）"
+          - "開発Tips"
+          - "ユーザーの声（将来）"
+        kpi:
+          - "フォロワー: 3,000+（12ヶ月）"
+          - "月間インプレッション: 100,000+"
+      
+      - id: tech_articles
+        name: "技術記事（Zenn/note/Qiita）"
+        priority: 2
+        purpose: "SEO獲得 & 深い信頼構築 & コンテンツ資産"
+        frequency: "月2-4本"
+        platforms:
+          - name: "Zenn"
+            focus: "技術詳細・チュートリアル"
+          - name: "note"
+            focus: "思想・ストーリー・事例"
+          - name: "Qiita"
+            focus: "Tips・実装詳細"
+        content_types:
+          - "SSOT活用ベストプラクティス"
+          - "Cursor × dev-OS の使い方"
+          - "AI開発の失敗パターンと対策"
+          - "導入事例・Before/After"
+        kpi:
+          - "累計記事数: 30+（12ヶ月）"
+          - "月間PV: 10,000+"
+      
+      - id: youtube
+        name: "YouTube / デモ動画"
+        priority: 3
+        purpose: "デモ動画 & チュートリアル（53.9%がYouTube利用）"
+        frequency: "月2本"
+        content_types:
+          - "製品デモ（2-3分）"
+          - "セットアップガイド"
+          - "ユースケース紹介"
+          - "ユーザー事例インタビュー"
+      
+      - id: seo
+        name: "SEO（Google検索）"
+        priority: 4
+        purpose: "長期的な流入源（71.3%が検索エンジン利用）"
+        tactics:
+          - "LP・ブログ・Zenn記事のキーワード最適化"
+          - "FAQ・用語集の充実"
+      
+      - id: aio
+        name: "AIO（AI Optimization）"
+        priority: 5
+        purpose: "ChatGPT等での情報収集対応（28.7%利用）"
+        tactics:
+          - "公式ドキュメントの構造化"
+          - "GitHubリポジトリの整備"
+    
+    removed_channels:
+      - id: linkedin
+        reason: "日本ではエンジニアがLinkedInを積極的に使わない"
+      - id: exhibition
+        reason: "初期フェーズではROIが低い"
+    
+    topic_clusters:
+      - cluster: "AI開発の品質問題"
+        keywords:
+          - "Cursor 品質"
+          - "AI コード レビュー"
+          - "Vibe Coding 問題"
+          - "AI 開発 失敗"
+        articles:
+          - "なぜAI開発は途中で破綻するのか？5つのパターンと対策"
+          - "Vibe Codingの限界と、そこから抜け出す方法"
+          - "AIで作ったコードを『確信』を持ってリリースする方法"
+      
+      - cluster: "SSOT・仕様駆動開発"
+        keywords:
+          - "SSOT とは"
+          - "仕様駆動開発"
+          - "Spec-first"
+          - "YAML 仕様管理"
+        articles:
+          - "SSOTとは何か？AI時代の仕様管理の新常識"
+          - "YAMLで仕様を書く技術：dev-OS実践ガイド"
+          - "Cursor × dev-OS で開発効率を10倍にした話"
+
+  # ===== 5. リード獲得ファネル =====
+  lead_funnel:
+    
+    awareness:
+      channels: ["Zenn記事", "Twitter", "テックイベント登壇"]
+      goal: "月間1,000 UU"
+      metric: "サイト訪問数"
+    
+    interest:
+      channels: ["LP", "デモ動画", "ブログ"]
+      goal: "10%がFree登録"
+      metric: "無料登録数"
+    
+    consideration:
+      channels: ["製品内体験", "週次Digest", "サポート"]
+      goal: "5%がPro/Team検討"
+      metric: "プラン検討ページ閲覧"
+    
+    decision:
+      channels: ["デモ予約", "営業フォロー"]
+      goal: "15%が有料転換"
+      metric: "有料プラン契約数"
+    
+    retention:
+      channels: ["SSOT累積価値", "週次レポート", "コミュニティ"]
+      goal: "月次チャーン率5%以下"
+      metric: "解約率"
+
+  # ===== 6. M&A Exit 視点での戦略調整（日本主軸 + 海外シグナリング） =====
+  exit_optimization:
+    goal: "1年以内に1億円（約$660K USD）でのM&A Exit"
+    reference: "ssot/exit_strategy.yml, ssot/user_acquisition.yml"
+    
+    key_insight: |
+      リサーチ結果に基づく戦略:
+      1. 日本市場主軸（売上90%）: 直接競合ゼロ、創業者ネットワーク活用
+      2. 海外シグナリング（認知30%）: Product Hunt/Hacker Newsで露出
+      3. X/note/Zenn発信 × PLGファーストが最も効果的
+      4. LinkedIn営業は日本では効果薄いため除外
+    
+    marketing_shift:
+      from: "リアルなつながりベース（カンファレンス/紹介）"
+      to: "X/note/Zenn発信 × PLGファースト"
+      
+    priority_changes:
+      - area: "メインチャネル"
+        before: "LinkedIn営業、カンファレンス登壇"
+        after: "X（Build in Public）、Zenn/note/Qiita技術記事"
+        reason: "日本のエンジニアはX/Zennで情報収集。コストゼロでスケール可能"
+      - area: "顧客獲得フロー"
+        before: "紹介・リファラル中心"
+        after: "バズ→LP→無料登録→有料転換のファネル"
+        reason: "PLGがエンジニア向けツールには最適"
+      - area: "カンファレンス登壇"
+        before: "初期から注力"
+        after: "Month 7以降に本格化"
+        reason: "初期はROIが低い。まずコンテンツ資産を蓄積"
+      - area: "海外マーケティング"
+        before: "なし"
+        after: "Product Hunt/Hacker News/Twitter英語"
+        reason: "海外買収候補への認知獲得"
+      - area: "言語対応"
+        before: "日本語のみ"
+        after: "日本語+英語（最低限）"
+        reason: "海外買収候補対応"
+
+  # ===== 7. アクションプラン =====
+  action_plan:
+    
+    phase0:
+      name: "即座にやるべきこと"
+      timeline: "1週間以内"
+      items:
+        - id: ap01
+          task: "無料プランの設計と実装"
+          priority: "critical"
+          owner: "設計AI"
+          ssot_impact: ["ssot/platform.yml", "ssot/pricing.yml"]
+        - id: ap02
+          task: "LPのファーストビュー改修"
+          priority: "critical"
+          owner: "実装AI"
+          ssot_impact: ["apps/lp/index.html"]
+        - id: ap03
+          task: "デモ動画の企画・撮影"
+          priority: "high"
+          owner: "人間"
+    
+    phase1:
+      name: "1ヶ月以内にやるべきこと"
+      timeline: "4週間以内"
+      items:
+        - id: ap04
+          task: "料金プランの再設計・実装"
+          priority: "high"
+          owner: "設計AI + 実装AI"
+        - id: ap05
+          task: "ペルソナ別LP作成（検討）"
+          priority: "medium"
+          owner: "設計AI"
+        - id: ap06
+          task: "導入事例・Before/Afterの追加"
+          priority: "high"
+          owner: "人間 + 実装AI"
+    
+    phase2:
+      name: "3ヶ月以内にやるべきこと"
+      timeline: "12週間以内"
+      items:
+        - id: ap07
+          task: "Zenn連載開始"
+          priority: "medium"
+          owner: "人間"
+        - id: ap08
+          task: "リファラルプログラム設計"
+          priority: "low"
+          owner: "設計AI"
+        - id: ap09
+          task: "Product-Led Onboarding最適化"
+          priority: "medium"
+          owner: "設計AI + 実装AI"
+

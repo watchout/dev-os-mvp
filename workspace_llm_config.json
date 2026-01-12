@@ -1,0 +1,84 @@
+{
+  "slots": {
+    "market_analyst": {
+      "label": "Market Analyst / 市場・潮流・データ解析",
+      "defaultModel": "gpt-4o",
+      "notes": "事実、統計、トレンド、競合環境を客観的に分析する"
+    },
+    "strategy_designer": {
+      "label": "Strategy & Insight Designer / 戦略・心理・成長設計",
+      "defaultModel": "o1-preview",
+      "notes": "ユーザーの深層心理に基づき、勝てる戦略と成長循環を設計する"
+    },
+    "brand_guardian": {
+      "label": "Brand & Narrative Guardian / 物語・品格・監査",
+      "defaultModel": "claude-3-5-sonnet-20241022",
+      "notes": "戦略に体温（物語）を込め、ブランドの誠実さを監査する"
+    },
+    "drafter": {
+      "label": "Drafter (設計/草案)",
+      "defaultModel": "gpt-4o",
+      "notes": "構想・SSOT草案・プロンプト初版を作る役割"
+    },
+    "reviewer": {
+      "label": "Reviewer (レビュー)",
+      "defaultModel": "claude-3-5-sonnet-20241022",
+      "notes": "整合性・抜け漏れ・ルール違反のチェックを行う役割"
+    },
+    "light": {
+      "label": "Light (高速/安価)",
+      "defaultModel": "gemini-2.0-flash-exp",
+      "notes": "要約・軽い修正・補助タスク向け"
+    }
+  },
+  "presets": {
+    "fast": {
+      "description": "とにかく速くラフ案がほしいときのモード (Marketer+Drafter)",
+      "slots": {
+        "marketer": "gpt-4o-mini",
+        "drafter": "gpt-4o-mini",
+        "reviewer": "gpt-4o-mini",
+        "light": "gemini-2.0-flash-exp"
+      }
+    },
+    "balanced": {
+      "description": "標準構成: 3つの専門分野による共創",
+      "slots": {
+        "market_analyst": "gpt-4o",
+        "strategy_designer": "gpt-4o",
+        "brand_guardian": "claude-3-5-sonnet-20241022",
+        "drafter": "claude-3-5-sonnet-20241022",
+        "reviewer": "gpt-4o",
+        "light": "gemini-2.0-flash-exp"
+      }
+    },
+    "strict": {
+      "description": "最高品質: 推論モデル(o1)を主軸に据えた深層設計",
+      "slots": {
+        "market_analyst": "gpt-4o",
+        "strategy_designer": "o1-preview",
+        "brand_guardian": "claude-3-5-sonnet-20241022",
+        "drafter": "claude-3-5-sonnet-20241022",
+        "reviewer": "o1-mini",
+        "light": "gpt-4o"
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

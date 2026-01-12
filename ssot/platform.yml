@@ -1,0 +1,403 @@
+# ssot/platform.yml
+# dev-OS Platform SSOT - 管理画面・認証・課金の設計正本
+
+platform:
+  version: "1.0"
+  description: "dev-OS SaaS プラットフォーム設計"
+
+# ===== 1. データモデル（Entities） =====
+entities:
+
+  - id: user
+    name: ユーザー
+    description: "dev-OS にログインする個人。認証は Supabase Auth に委任。"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+        note: "Supabase auth.users.id と 1:1 同期"
+      - name: email
+        type: string
+        unique: true
+        required: true
+      - name: name
+        type: string
+        required: true
+      - name: avatar_url
+        type: string
+        nullable: true
+      - name: created_at
+        type: datetime
+      - name: updated_at
+        type: datetime
+
+  - id: organization
+    name: 組織（テナント）
+    description: "課金・権限・プロジェクトの単位"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+      - name: name
+        type: string
+        required: true
+      - name: slug
+        type: string
+        unique: true
+        required: true
+        note: "URL用識別子（例: my-team）"
+      - name: plan_id
+        type: enum
+        values: [free, pro, team, enterprise]
+        default: free
+        note: "v2.0 料金体系（2026-01-02 マーケティング監修により変更）。詳細は ssot/pricing.yml 参照"
+      - name: billing_email
+        type: string
+        nullable: true
+      - name: created_at
+        type: datetime
+      - name: updated_at
+        type: datetime
+
+  - id: organization_member
+    name: 組織メンバー
+    description: "ユーザーと組織の紐付け＋ロール"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+      - name: organization_id
+        type: uuid
+        foreign: organization.id
+        required: true
+      - name: user_id
+        type: uuid
+        foreign: user.id
+        required: true
+      - name: role
+        type: enum
+        values: [owner, admin, member, viewer]
+        required: true
+      - name: invited_at
+        type: datetime
+      - name: joined_at
+        type: datetime
+        nullable: true
+
+  - id: workspace
+    name: ワークスペース
+    description: "SSOT・ワークフローを管理する単位（旧Project）"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+      - name: organization_id
+        type: uuid
+        foreign: organization.id
+        required: true
+      - name: name
+        type: string
+        required: true
+      - name: slug
+        type: string
+        required: true
+      - name: description
+        type: text
+        nullable: true
+      - name: github_repo_url
+        type: string
+        nullable: true
+        note: "Phase 2 以降で GitHub 連携"
+      - name: created_at
+        type: datetime
+      - name: updated_at
+        type: datetime
+
+  - id: api_key
+    name: APIキー
+    description: "LLM 呼び出し用の暗号化キー（BYO対応）"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+      - name: organization_id
+        type: uuid
+        foreign: organization.id
+        required: true
+      - name: provider
+        type: enum
+        values: [openai, anthropic, google]
+        required: true
+      - name: label
+        type: string
+        required: true
+        note: "識別用ラベル（例: Production OpenAI）"
+      - name: encrypted_key
+        type: string
+        required: true
+        note: "AES-256-GCM で暗号化"
+      - name: is_active
+        type: boolean
+        default: true
+      - name: last_used_at
+        type: datetime
+        nullable: true
+      - name: created_at
+        type: datetime
+
+  - id: execution_log
+    name: 実行ログ
+    description: "ワークフロー実行の監査ログ。ガバナンスと連動。"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+      - name: organization_id
+        type: uuid
+        foreign: organization.id
+      - name: workspace_id
+        type: uuid
+        foreign: workspace.id
+        nullable: true
+      - name: user_id
+        type: uuid
+        foreign: user.id
+      - name: workflow_id
+        type: string
+        required: true
+      - name: command_tag
+        type: string
+        nullable: true
+      - name: billing_type
+        type: enum
+        values: [platform_credit, byo_key]
+        required: true
+      - name: input_summary
+        type: text
+        note: "入力の要約（個人情報は含めない）"
+      - name: output_summary
+        type: text
+        nullable: true
+      - name: halt
+        type: boolean
+        default: false
+      - name: halt_trigger_id
+        type: string
+        nullable: true
+        note: "ssot/governance.yml の triggers[].id を参照"
+      - name: token_usage
+        type: jsonb
+        note: "{ input: number, output: number, model: string }"
+      - name: duration_ms
+        type: integer
+      - name: created_at
+        type: datetime
+
+  - id: audit_log
+    name: 監査ログ
+    description: "システム設定やメンバー操作の変更履歴"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+      - name: organization_id
+        type: uuid
+        foreign: organization.id
+      - name: user_id
+        type: uuid
+        foreign: user.id
+      - name: action
+        type: string
+        note: "例: API_KEY_CREATED, MEMBER_INVITED, PLAN_UPGRADED"
+      - name: metadata
+        type: jsonb
+        nullable: true
+      - name: created_at
+        type: datetime
+
+  - id: credit_usage
+    name: クレジット使用量
+    description: "月次のトークン使用量集計"
+    fields:
+      - name: id
+        type: uuid
+        primary: true
+      - name: organization_id
+        type: uuid
+        foreign: organization.id
+      - name: year_month
+        type: string
+        note: "YYYY-MM 形式"
+      - name: total_input_tokens
+        type: bigint
+        default: 0
+      - name: total_output_tokens
+        type: bigint
+        default: 0
+      - name: estimated_cost_usd
+        type: decimal
+        default: 0
+
+# ===== 2. 機能一覧（Features） =====
+features:
+
+  - id: auth
+    name: 認証
+    priority: 1
+    description: "ユーザー登録・ログイン・パスワードリセット（Supabase Auth利用）"
+    usecases:
+      - id: auth-register
+        goal: "メールアドレスでユーザー登録する"
+      - id: auth-login
+        goal: "メール＋パスワードでログインする"
+      - id: auth-logout
+        goal: "セッションを破棄してログアウトする"
+
+  - id: organization-management
+    name: 組織管理
+    priority: 2
+    description: "組織の作成・設定・メンバー招待・ロール管理"
+    usecases:
+      - id: org-create
+        goal: "新しい組織を作成する"
+      - id: org-invite
+        goal: "メンバーをメールで招待する"
+      - id: org-role-change
+        goal: "メンバーのロールを変更する"
+
+  - id: workspace-management
+    name: ワークスペース管理
+    priority: 3
+    description: "ワークスペースの作成・設定・SSOT管理"
+    usecases:
+      - id: workspace-create
+        goal: "組織内に新しいワークスペースを作成する"
+      - id: workspace-settings
+        goal: "ワークスペースの設定を変更する"
+
+  - id: api-key-management
+    name: APIキー管理
+    priority: 2
+    description: "LLM 用 API キーの登録・暗号化保存（AES-256-GCM）"
+    usecases:
+      - id: apikey-add
+        goal: "新しい API キーを登録する"
+      - id: apikey-list
+        goal: "登録済み API キー一覧を表示する（キー本体はマスク）"
+
+  - id: workflow-execution
+    name: ワークフロー実行
+    priority: 1
+    description: "Drafter / Reviewer / Refiner の実行と結果表示"
+    usecases:
+      - id: exec-run
+        goal: "定義されたワークフローを実行する"
+      - id: exec-view-history
+        goal: "過去の実行ログと Halt 理由を確認する"
+
+  - id: billing
+    name: 課金管理
+    priority: 4
+    description: "プラン確認・変更・クレジット使用量確認（Stripe連携想定）"
+    usecases:
+      - id: billing-view-plan
+        goal: "現在のプランとクレジット残量を確認する"
+      - id: billing-upgrade
+        goal: "Stripe 経由でプランをアップグレードする"
+
+# ===== 3. 画面一覧（UI Screens） =====
+# 詳細は docs/UI_UX_SPEC.md を参照。
+ui_screens:
+
+  - id: lp-home
+    name: ランディングページ
+    path: /
+    feature: marketing
+
+  - id: login
+    name: ログイン画面
+    path: /login
+    feature: auth
+
+  - id: console-dashboard
+    name: コンソール・ダッシュボード
+    path: /console
+    feature: workflow-execution
+    description: "所属組織、クレジット状況、最近の活動を表示"
+
+  - id: org-top
+    name: 組織トップ
+    path: /console/:org
+    feature: organization-management
+    description: "組織内のワークスペース一覧"
+
+  - id: workspace-detail
+    name: ワークスペース詳細（コクピット）
+    path: /console/:org/:ws
+    feature: workspace-management
+    description: "SSOT 参照、Plan 生成、実行のメイン画面"
+
+  - id: execution-history
+    name: 実行履歴
+    path: /console/:org/:ws/history
+    feature: workflow-execution
+    description: "過去の実行ログ、Halt 理由の監査"
+
+  - id: api-keys
+    name: APIキー設定
+    path: /settings/:org/api-keys
+    feature: api-key-management
+
+  - id: billing
+    name: 課金・プラン
+    path: /settings/:org/billing
+    feature: billing
+
+  - id: kickoff-discovery-session
+    name: 知恵の深掘りセッション
+    path: /console/:org/:ws/discovery
+    feature: kickoff-strategy-analysis
+    description: "VoC（顧客の声）から戦略的SSOTを生成する対話型コクピット"
+
+# ===== 4. 技術スタック（確定事項） =====
+tech_stack:
+  auth: "Supabase Auth"
+  database: "PostgreSQL (Supabase / Neon)"
+  orm: "Prisma"
+  backend: "Next.js (API Routes) / Hono"
+  frontend: "Next.js (App Router)"
+  billing: "Stripe Billing"
+  encryption: "AES-256-GCM"
+
+# ===== 5. ビジネスロジック・ガードレール（Logic） =====
+logic:
+
+  - id: usage-limits
+    name: プラン別制限ロジック
+    description: "organization.plan_id に基づくリソース制限の強制"
+    rules:
+      - "workflow_execution 実行前に、その月の execution_log 数（当月）をカウント"
+      - "Free プランの場合、月間実行数が 10 回を超えていれば実行を拒否し、アップグレードを促す"
+      - "execution_log の保持期間を過ぎたデータは、日次のクリーンアップジョブで物理削除"
+
+  - id: seat-management
+    name: シートライセンス管理
+    description: "Team プラン以上のメンバー数に基づく課金制御"
+    rules:
+      - "organization_member のうち、role が 'guest' 以外の人数を 'Active Seats' として扱う"
+      - "Team プランの基本料金には 5 シートが含まれる"
+      - "6 シート目以降は、Stripe の Metered Billing（従量課金）として月次で請求"
+      - "シート追加時は、管理者への警告と Stripe Subscription の update を行う"
+
+  - id: registration-flow
+    name: 新規登録・オンボーディング
+    description: "ユーザー登録から組織作成までのフロー"
+    steps:
+      1: "Supabase Auth でサインアップ（user.email, password）"
+      2: "Supabase Webhook (auth.users inserts) が /api/v1/auth/webhook を叩く"
+      3: "webhook 処理内で db.users に UUID 同期でレコード作成"
+      4: "初回アクセス時、所属組織が 0 の場合のみ 'Personal Organization' を自動作成（plan_id: free）"
+      5: "作成した組織配下に 'Default Workspace' を作成し、オンボーディング完了"
+    security:
+      - "Webhook エンドポイントは Supabase の Signing Secret で署名検証を必須とする"
+      - "organization_member テーブルにより、他者の組織への不正アクセスを RLS で防止する"

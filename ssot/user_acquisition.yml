@@ -1,0 +1,436 @@
+# ===================================================================
+# ユーザー獲得戦略（日本市場 × AI感度高エンジニア）
+# 
+# 作成日: 2026-01-03
+# 最終更新: 2026-01-03
+# 
+# 目的: X/noteで情報を仕入れるAI感度の高いエンジニア向けの
+#       現実的なユーザー獲得ロジックを定義
+# ===================================================================
+
+version: "1.0.0"
+
+# ===================================================================
+# 1. ターゲットペルソナ（リサーチ検証済み）
+# ===================================================================
+
+target_persona:
+  name: "AI感度の高いエンジニア（アキラさん）"
+  age_range: "25-40歳"
+  role: 
+    - "スタートアップエンジニア / テックリード"
+    - "個人開発者 / フリーランス"
+    - "SIer脱出組で自社プロダクト開発中"
+  
+  # 行動特性（リサーチ検証済み）
+  behavioral_traits:
+    information_sources:
+      primary:
+        - channel: "検索エンジン（Google）"
+          usage_rate: "71.3%"
+          note: "最も重要なチャネル。SEO必須"
+        - channel: "X（旧Twitter）"
+          usage_rate: "高（特に20-30代）"
+          note: "リアルタイム情報・バズのきっかけ"
+      secondary:
+        - channel: "YouTube"
+          usage_rate: "53.9%"
+          note: "チュートリアル・デモ動画"
+        - channel: "生成AIツール（ChatGPT等）"
+          usage_rate: "28.7%"
+          note: "AIに聞いて情報収集。AIO対策が必要"
+        - channel: "note / Zenn / Qiita"
+          usage_rate: "中〜高"
+          note: "深掘り記事・信頼構築"
+      tertiary:
+        - channel: "ウェビナー"
+          usage_rate: "33%"
+          note: "リード獲得に有効"
+        - channel: "connpass（技術イベント）"
+          usage_rate: "中"
+          note: "コミュニティ形成"
+    
+    # ツール選定行動
+    tool_adoption_pattern:
+      discovery:
+        - "X（Twitter）でバズっているのを見る"
+        - "同僚・知人からの紹介"
+        - "技術記事（Zenn/Qiita/note）で知る"
+        - "Google検索で課題解決策を探す"
+        - "ChatGPTに聞いてみる"
+      evaluation:
+        - "無料で試せるか（Freemium必須）"
+        - "5分以内に価値を体感できるか"
+        - "公式ドキュメント・READMEの質"
+        - "GitHubスター数・コミュニティの活性度"
+      conversion:
+        - "チームに導入提案（4-8人チームなら本人が意思決定者）"
+        - "月額1万円以下なら個人判断で導入"
+        - "月額10万円超はCTO/VPoE決裁"
+  
+  # 心理特性
+  psychographics:
+    values:
+      - "効率化・自動化への強い関心"
+      - "新しいツール・技術への早期採用意欲"
+      - "品質とスピードの両立"
+      - "自分で試して納得したい"
+    pain_points:
+      - "AIに任せると結局自分で直す"
+      - "チーム内でAI活用レベルがバラバラ"
+      - "仕様がチャット履歴に埋もれる"
+      - "SaaS要件（認証・課金）の抜け漏れ"
+    goals:
+      - "AIを活用しながら品質を担保したい"
+      - "レビュー負荷を減らして本質に集中したい"
+      - "一人でもSaaS品質のプロダクトを作りたい"
+
+# ===================================================================
+# 2. ユーザー獲得ファネル
+# ===================================================================
+
+acquisition_funnel:
+  
+  # ============ TOFU（認知）============
+  awareness:
+    goal: "dev-OSの存在を知ってもらう"
+    kpi:
+      - metric: "X インプレッション"
+        target_monthly: 100000
+      - metric: "Zenn/note/Qiita 記事PV"
+        target_monthly: 10000
+      - metric: "Google検索 表示回数"
+        target_monthly: 5000
+    
+    channels:
+      - id: twitter_organic
+        name: "X（Twitter）オーガニック"
+        priority: "critical"
+        tactics:
+          - type: "Build in Public"
+            description: "開発過程・学び・失敗をリアルタイム共有"
+            frequency: "毎日1-3ツイート"
+            content_examples:
+              - "今日追加した機能の裏側"
+              - "AI開発でハマったポイントと解決策"
+              - "SSOTで救われた事例"
+          - type: "バズ狙い投稿"
+            description: "キャッチーな切り口でAI開発の課題を可視化"
+            frequency: "週1-2回"
+            content_examples:
+              - "AIで作ったコード、結局自分で直してませんか？"
+              - "仕様書、チャット履歴に埋もれてません？"
+          - type: "エンゲージメント"
+            description: "AI開発関連の投稿にリプライ・引用RT"
+            frequency: "毎日"
+        effort: "low"
+        expected_roi: "high"
+      
+      - id: tech_articles
+        name: "技術記事（Zenn / note / Qiita）"
+        priority: "critical"
+        tactics:
+          - type: "How-to記事"
+            description: "dev-OSの使い方・連携方法"
+            frequency: "月2-4記事"
+          - type: "思想記事"
+            description: "SSOT駆動開発・マルチLLM監査の考え方"
+            frequency: "月1-2記事"
+          - type: "事例記事"
+            description: "導入企業のビフォー・アフター"
+            frequency: "導入ごと"
+        platforms:
+          - name: "Zenn"
+            focus: "技術詳細・チュートリアル"
+            seo_power: "高"
+          - name: "note"
+            focus: "思想・ストーリー・事例"
+            sharing_power: "高"
+          - name: "Qiita"
+            focus: "Tips・実装詳細"
+            community_reach: "高"
+        effort: "medium"
+        expected_roi: "high"
+      
+      - id: seo
+        name: "SEO（Google検索）"
+        priority: "high"
+        tactics:
+          - type: "ターゲットキーワード"
+            keywords:
+              - "AI 開発 品質管理"
+              - "Cursor 使い方 SSOT"
+              - "AIコード レビュー 自動化"
+              - "SaaS 開発 設計書 管理"
+              - "LLM マルチエージェント 開発"
+          - type: "コンテンツ戦略"
+            description: "LP・ブログ・Zenn記事を連動させた包括的SEO"
+        effort: "medium"
+        expected_roi: "high（長期）"
+      
+      - id: aio
+        name: "AIO（AI Optimization）"
+        priority: "medium"
+        description: "ChatGPT等の生成AIでdev-OSが推薦されるように最適化"
+        tactics:
+          - "公式ドキュメントの構造化"
+          - "FAQ・用語集の充実"
+          - "GitHubリポジトリの整備"
+        note: "28.7%がAIで情報収集。新しいSEOとして重要"
+        effort: "medium"
+        expected_roi: "medium（将来性高）"
+  
+  # ============ MOFU（興味・検討）============
+  interest:
+    goal: "価値を理解し、試してみたいと思わせる"
+    kpi:
+      - metric: "LP訪問数"
+        target_monthly: 3000
+      - metric: "LP → 無料登録 転換率"
+        target: "5-10%"
+    
+    channels:
+      - id: landing_page
+        name: "LP（ランディングページ）"
+        priority: "critical"
+        requirements:
+          - "5秒で価値が伝わるヘッドライン"
+          - "30秒で試せるCTA"
+          - "デモ動画（2-3分）"
+          - "導入事例（ビフォー・アフター）"
+          - "料金プランの明確な提示"
+        optimization:
+          - "A/Bテスト（ヘッドライン、CTA）"
+          - "ヒートマップ分析"
+      
+      - id: demo_video
+        name: "製品デモ動画"
+        priority: "high"
+        description: "2-3分でdev-OSの価値を可視化"
+        content:
+          - "Before: AI開発の課題を再現"
+          - "After: dev-OSで解決する様子"
+          - "実際のUI操作"
+        platforms:
+          - "LP埋め込み"
+          - "YouTube"
+          - "X（切り抜き）"
+  
+  # ============ BOFU（試用・転換）============
+  trial:
+    goal: "無料登録 → アクティブ利用"
+    kpi:
+      - metric: "無料登録数"
+        target_monthly: 150
+      - metric: "Day 7 リテンション"
+        target: "40%"
+      - metric: "ワークフロー実行率"
+        target: "60%"
+    
+    tactics:
+      - id: frictionless_onboarding
+        name: "フリクションレスなオンボーディング"
+        description: "登録から価値体感まで5分以内"
+        requirements:
+          - "GitHub/Googleログイン（1クリック登録）"
+          - "初回セットアップウィザード"
+          - "サンプルワークスペース提供"
+          - "最初のワークフロー実行までのガイド"
+      
+      - id: activation_triggers
+        name: "アクティベーションメール"
+        sequence:
+          - day: 0
+            content: "ようこそ！最初の5分でできること"
+          - day: 1
+            content: "最初のワークフローを実行しましたか？"
+          - day: 3
+            content: "SSOTテンプレートで時短しよう"
+          - day: 7
+            content: "Pro版で無制限に使ってみませんか？"
+  
+  # ============ 転換（有料化）============
+  conversion:
+    goal: "無料 → Pro/Team 転換"
+    kpi:
+      - metric: "Free → Pro 転換率"
+        target: "5-10%"
+      - metric: "Free → Team 転換率"
+        target: "2-5%"
+      - metric: "平均転換日数"
+        target: "14-30日"
+    
+    triggers:
+      - name: "ワークフロー上限到達"
+        description: "月10回の上限に達したら自然にアップグレード"
+      - name: "チームメンバー招待"
+        description: "2人目以降はTeamプラン"
+      - name: "監査ログ需要"
+        description: "本番運用時にEnterprise検討"
+    
+    tactics:
+      - id: upgrade_prompts
+        name: "文脈に沿ったアップグレード提案"
+        examples:
+          - trigger: "上限到達"
+            message: "もっと使いたいですか？Proなら無制限です"
+          - trigger: "複数プロジェクト作成"
+            message: "チームで使うならTeamプランがお得です"
+
+# ===================================================================
+# 3. 具体的な実行計画（12ヶ月）
+# ===================================================================
+
+execution_plan:
+  
+  month_1_2:
+    theme: "基盤構築 & 初期コンテンツ"
+    activities:
+      - "Xアカウント本格運用開始（Build in Public）"
+      - "Zenn/note 記事 4-6本公開"
+      - "LP v2.0 完成（デモ動画含む）"
+      - "Freeプラン提供開始"
+    targets:
+      free_signups: 50
+      mrr_jpy: 0
+  
+  month_3_4:
+    theme: "認知拡大 & 初期有料顧客"
+    activities:
+      - "X投稿頻度アップ（バズ狙い）"
+      - "技術記事 8-10本蓄積"
+      - "初期導入事例 1-2社公開"
+      - "Proプラン提供開始"
+    targets:
+      free_signups: 150
+      pro_customers: 10
+      mrr_jpy: 50000
+  
+  month_5_6:
+    theme: "口コミ醸成 & Team展開"
+    activities:
+      - "ユーザーコミュニティ形成（Discord/Slack）"
+      - "導入事例 3-5社"
+      - "Teamプラン提供開始"
+      - "connpassでイベント開催"
+    targets:
+      free_signups: 300
+      pro_customers: 25
+      team_customers: 3
+      mrr_jpy: 200000
+  
+  month_7_9:
+    theme: "スケール & 海外シグナリング"
+    activities:
+      - "Product Hunt ローンチ"
+      - "英語LP公開"
+      - "国内導入事例 10社"
+      - "メディア露出（TechCrunch Japan等）"
+    targets:
+      free_signups: 600
+      pro_customers: 50
+      team_customers: 8
+      mrr_jpy: 500000
+  
+  month_10_12:
+    theme: "Exit準備 & ARR達成"
+    activities:
+      - "Enterpriseプラン提供開始"
+      - "導入事例 20社"
+      - "Acquire.comリスティング"
+      - "買収候補へのアプローチ開始"
+    targets:
+      free_signups: 1000
+      pro_customers: 80
+      team_customers: 15
+      enterprise_customers: 2
+      mrr_jpy: 1250000
+
+# ===================================================================
+# 4. 成功指標（KPI）
+# ===================================================================
+
+kpis:
+  monthly:
+    - metric: "新規Free登録"
+      target_month_12: 100
+    - metric: "Free → Pro 転換率"
+      target: "8%"
+    - metric: "MRR"
+      target_month_12: 1250000
+    - metric: "CAC（顧客獲得コスト）"
+      target: "< ¥10,000"
+    - metric: "LTV/CAC"
+      target: "> 3"
+  
+  channel_specific:
+    twitter:
+      - "フォロワー数: 3,000+"
+      - "月間インプレッション: 100,000+"
+      - "エンゲージメント率: 3%+"
+    tech_articles:
+      - "累計記事数: 30+"
+      - "月間PV: 10,000+"
+      - "被リンク数: 50+"
+    organic_search:
+      - "月間流入: 2,000+"
+      - "ターゲットKW 10位以内: 5つ+"
+
+# ===================================================================
+# 5. リスクと対策
+# ===================================================================
+
+risks:
+  - id: low_twitter_engagement
+    description: "X投稿がバズらない"
+    probability: "high"
+    mitigation:
+      - "A/Bテストで投稿パターン最適化"
+      - "インフルエンサーとの協業"
+      - "有益コンテンツ > 宣伝の比率を8:2に"
+  
+  - id: low_conversion
+    description: "無料から有料への転換率が低い"
+    probability: "medium"
+    mitigation:
+      - "オンボーディング改善"
+      - "価値体感までの時間短縮"
+      - "アップグレードトリガーの最適化"
+  
+  - id: competitor_entry
+    description: "大手がAI開発品質管理に参入"
+    probability: "low"
+    mitigation:
+      - "日本市場でのブランド確立を急ぐ"
+      - "導入事例を早期に蓄積"
+      - "コミュニティを形成し、スイッチングコストを高める"
+
+# ===================================================================
+# 6. 従来戦略からの変更点
+# ===================================================================
+
+strategy_changes:
+  removed:
+    - id: linkedin_sales
+      reason: "日本では効果が低い。エンジニアはLinkedInを積極的に使わない"
+    - id: conference_speaking
+      reason: "初期フェーズではROIが低い。Month 7以降に再検討"
+    - id: referral_program
+      reason: "有料顧客が増えてから。初期は不要"
+  
+  added:
+    - id: build_in_public
+      reason: "コストゼロでバズの可能性。エンジニア共感を得やすい"
+    - id: aio_optimization
+      reason: "28.7%がAIで情報収集。新しいチャネルとして重要"
+    - id: youtube_demo
+      reason: "53.9%がYouTube利用。デモ動画の効果大"
+  
+  prioritized:
+    - id: twitter_organic
+      reason: "リアルタイム性・バイラル性。コストゼロ"
+    - id: tech_articles
+      reason: "SEO効果・信頼構築・コンテンツ資産"
+    - id: freemium
+      reason: "エンジニアは無料で試したい。PLGの要"
+

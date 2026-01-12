@@ -1,0 +1,29 @@
+{
+  "rules": [
+    "仕様や設計に関わる変更・提案を行うAIは、常に docs/DEV_OS_SPEC.md と DEV_RULES.md、さらに IYASAKA ブランドの正本である docs/IYASAKA_BRAND_PROTOCOL.md を最初に参照し、前提を共有したうえで動作すること。",
+    "設計・実装の際は、ssot/project.yml, ssot/features.yml, ssot/platform.yml に加え、マーケティング戦略（ssot/personas.yml, ssot/pricing.yml, ssot/marketing.yml）を必ず参照すること。",
+    "設計AI（Architect/Manager AI）は、ファイル構成・SSOT・workflows.yml・workspace_llm_config.json・.cursorrules などの設計・編集を担当し、コードの具体的実装は実装AIに依頼すること。",
+    "実装AI（Implementation AI）は、確定したSSOTとDEV_RULES.mdに従ってコードやスクリプトを編集し、仕様判断に迷う場合は必ず設計AIまたは人間にエスカレーションすること。",
+    "一度に変更するファイルは原則として1つの目的に紐づく2〜3ファイルまでに制限し、広範囲の変更はステップを分けて提案すること。",
+    "画面・API・データ構造・ワークフローに影響する変更は、まず ssot/*.yml や workflows.yml を更新し、その後でコード変更を提案すること。SSOTを通さない仕様変更は禁止すること。",
+    "変更を行ったAIは、毎ターン『やったことの要約』『変更ファイル一覧』『重要な変更内容の抜粋』『次のアクション案』を簡潔に報告すること。",
+    "DEV_OS_SPEC.md や DEV_RULES.md、ssot/*.yml、.cursorrules、outputs/AI_GUIDE.md などのメタSSOTやガイドファイルを人間の確認なしに全削除・全面改稿することを禁止する。破壊的変更が必要な場合は必ず事前に人間へ理由と代替案を提示して承認を得ること。"
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,28 @@
+# ssot/content_schedule.yml
+# 認知から成約までのコンテンツ・ストリーム定義
+
+strategy:
+  theme_focus: "バイブコーディング（感覚）の限界と、設計（確信）による突破"
+  funnel:
+    awareness: "X (短文・速報・共感・バズ)"
+    trust: "Note / Zenn (思想・事例・技術的裏付け)"
+    conversion: "LP (確信の提供・Freeプラン登録)"
+
+schedules:
+  weekly_routine:
+    - platform: "X"
+      frequency: "1日3〜5回"
+      golden_times: ["08:00", "12:00", "18:00", "21:00"]
+      types:
+        - "Type1: 対比型 (Before/After)"
+        - "Type2: チラ見せ型 (開発実況)"
+        - "Type3: 思想型 (IYASAKA哲学)"
+    - platform: "Note/Zenn"
+      frequency: "週1〜2回"
+      theme: "技術的確信とブランドストーリー"
+
+governance:
+  boundary_line:
+    implemented: "SSOT駆動、多重監査、Webコンソール基本機能"
+    vision: "GitHub/Linear自動連携、MCPサーバ化、AIエージェント自律開発"
+  note: "発信時は『展望』であることを明示し、嘘のない『確信』を提供する。"

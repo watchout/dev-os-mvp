@@ -1,0 +1,100 @@
+features:
+  - id: "ssot-management"
+    name: "SSOT管理"
+    summary: "プロジェクトおよび機能ごとのSSOTをYAMLとして管理し、LLMワークフローの入力源とする。"
+    type: "core"
+    status: "in-progress"
+    usecases:
+      - id: "ssot.project_define"
+        actor: "Owner/Architect"
+        goal: "プロジェクト全体のVMVやドメイン情報をSSOTとして定義する"
+        trigger: "新しいプロダクトや開発OSプロジェクトを立ち上げるとき"
+      - id: "ssot.feature_define"
+        actor: "Architect"
+        goal: "MVPで扱う機能セットをSSOTとして整理する"
+        trigger: "フェーズやスコープを見直すとき"
+    non_functional:
+      ssot_first: true
+      multi_llm_required: true
+      tenant_isolation: "single-tenant-local"
+
+  - id: "cursor-prompt-generation"
+    name: "Cursor用プロンプト生成"
+    summary: >
+      SSOTと開発ルールから、実装AI向けのプロンプトやAIガイドを生成する。
+      特に、タスクごとの「やること・やらないこと・注意点」を一定の粒度で伝えることで、
+      実装の手戻りを減らす中核機能となる。
+    type: "core"
+    status: "planned"
+    usecases:
+      - id: "prompt.from_task"
+        actor: "Architect"
+        goal: "SSOTから派生したタスクに対して、実装AI用の詳細プロンプトを生成する"
+        trigger: "新しい実装タスクをCursorで着手するとき"
+    workflows:
+      - id: "generate_prompts"
+        summary: "タスク定義からCursor用プロンプトを生成するワークフロー"
+    non_functional:
+      ssot_first: true
+      multi_llm_required: true
+      output_targets:
+        - "outputs/AI_GUIDE.md"
+        - ".cursorrules"
+    stakeholders:
+      - "実装AIを使ってコードを書く開発者（リポジトリ所有者＋少人数チーム）"
+      - "将来的に dev-OS を導入する他プロジェクトの開発者"
+      - "品質・納期を気にするプロダクトオーナー／クライアント"
+    business_goal: >
+      実装AIに渡すプロンプトの品質を均一化し、機能ごとの「やること・やらないこと・注意点」を
+      毎回同じ粒度で伝えられるようにする。その結果として、実装の手戻りを減らし、
+      1タスクあたりの試行回数・修正回数を 20〜30% 程度削減することを目指す。
+    quality_attributes:
+      - "usability"
+      - "reliability"
+      - "maintainability"
+      - "transparency"
+    constraints:
+      - "プロンプトは主に TypeScript/Node.js ベースの Web/SaaS 開発を想定する"
+      - "実装AI側は Cursor 等のエディタ統合LLMを前提とし、ブラウザ専用LLMのみでは最適化しない"
+      - "LLMのAPIコストとレイテンシーを考慮し、1タスクあたりの Drafter/Reviewer/Refiner 呼び出し回数は常識的な範囲に抑える"
+      - "設計フェーズを飛ばしてプロンプトだけで仕様を決める運用は想定しない（SSOTファースト）"
+    risk_level: "high"
+
+  - id: "platform-management"
+    name: "プラットフォーム基盤管理"
+    # ... (既存の内容を維持) ...
+    related_ssot:
+      - "ssot/platform.yml"
+
+  - id: "kickoff-strategy-analysis"
+    name: "知恵の深掘り (Discovery Phase)"
+    summary: >
+      プロジェクト立ち上げ時に、VoC（顧客の声）を含む市場分析、戦略設計、ブランド物語を統合。
+      「売れる設計」を最初から開発工程に組み込む、dev-OS 独自の戦略的機能。
+    type: "optional-power-feature"
+    status: "planned"
+    usecases:
+      - id: "strategy.discovery"
+        actor: "Owner/Marketer"
+        goal: "ターゲットの真の課題を特定し、迷走しない開発の背骨（戦略）を作る"
+        trigger: "プロジェクト登録直後のキックオフフェーズ"
+    workflows:
+      - id: "kickoff_discovery"
+        summary: "3極の専門LLMによる市場分析から、戦略SSOTを生成するフロー"
+    non_functional:
+      marketer_led: true
+      output_ssots:
+        - "market_analyst": ["ssot/personas.yml", "ssot/market_analysis.yml"]
+        - "strategy_designer": ["ssot/value_proposition.yml", "ssot/pricing.yml", "ssot/growth_model.yml"]
+        - "brand_guardian": ["ssot/messaging_guide.yml", "ssot/brand_voice.yml"]
+    business_goal: >
+      「作ってから売り方を考える」のではなく、開発の最上流でPMF（Product Market Fit）の確度を最大化する。
+      ブランドの誠実さと成長循環（PLG）を設計に埋め込み、LTVの高いプロダクトを最速で世に送り出す。
+    business_goal: >
+      「ただ作る」のではなく「選ばれる理由」を設計段階で埋め込むことで、
+      開発の中盤以降での迷走を防ぎ、一貫したブランド価値を提供することを目的とする。
+
+
+
+
+

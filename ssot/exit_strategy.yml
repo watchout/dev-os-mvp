@@ -1,0 +1,655 @@
+# ssot/exit_strategy.yml
+# dev-OS M&A・Exit戦略 SSOT
+#
+# 目標: 1年以内に1億円でのM&A Exit
+# 作成日: 2026-01-03
+
+exit_strategy:
+  version: "1.0"
+  target_valuation: 100000000  # 1億円
+  target_timeline_months: 12
+  created_at: "2026-01-03"
+
+  # ===== 1. バリュエーション分析 =====
+  valuation_analysis:
+    
+    target: 100000000  # 1億円
+    
+    # SaaS バリュエーション手法
+    methods:
+      - id: arr-multiple
+        name: "ARR倍率法"
+        description: "年間経常収益 × 倍率でバリュエーションを算出"
+        typical_multiple_range:
+          low: 3  # 成長率低め、チャーン高め
+          mid: 5  # 標準的なSaaS
+          high: 10  # 高成長、低チャーン、AI関連
+        note: "AI開発ツールは希少性が高く、5〜8倍が期待できる"
+        
+      - id: strategic-premium
+        name: "戦略的プレミアム"
+        description: "買収者にとってのシナジー価値を上乗せ"
+        premium_range: "20〜50%"
+        applicable_cases:
+          - "買収者の既存プロダクトとの統合シナジー"
+          - "開発チームの acqui-hire（人材獲得）"
+          - "技術・特許の独占"
+    
+    # 1億円達成のためのARR逆算
+    required_metrics:
+      scenario_conservative:
+        arr_multiple: 5
+        required_arr: 20000000  # 2,000万円
+        required_mrr: 1666667   # 約167万円/月
+        note: "月額167万円 = Team(3万)×50社 or Pro(5千)×333人"
+      
+      scenario_moderate:
+        arr_multiple: 7
+        required_arr: 14285714  # 約1,430万円
+        required_mrr: 1190476   # 約120万円/月
+        note: "AI開発ツールとしてのプレミアム評価を獲得した場合"
+      
+      scenario_strategic:
+        arr_multiple: 10
+        required_arr: 10000000  # 1,000万円
+        required_mrr: 833333    # 約83万円/月
+        note: "戦略的買収（技術・チーム獲得目的）の場合"
+        additional_value:
+          - "技術的ユニーク性（SSOT×マルチLLM）"
+          - "創業者/チームの acqui-hire"
+          - "特許・ノウハウ"
+
+  # ===== 2. 仮想買収候補 =====
+  potential_acquirers:
+    
+    tier1_strategic:
+      description: "最も可能性が高い戦略的買収候補"
+      candidates:
+        
+        - id: freee
+          name: "freee株式会社"
+          market_cap: "約2,000億円"
+          relevance: "very-high"
+          rationale:
+            - "クラウドERP/会計SaaSで国内トップ"
+            - "開発生産性向上ツールへの関心（過去のM&A実績多数）"
+            - "AI活用を積極推進中"
+            - "dev-OSをfreee社内開発ツールとして活用→将来の外販可能性"
+          synergy:
+            - "freeeプロダクト開発チームの生産性向上"
+            - "パートナー/ISVエコシステムへの展開"
+          contact_path: "事業開発部門 or VC経由紹介"
+          
+        - id: money-forward
+          name: "株式会社マネーフォワード"
+          market_cap: "約1,500億円"
+          relevance: "high"
+          rationale:
+            - "M&A積極企業（BOXIL買収など実績あり）"
+            - "開発組織が大規模化→品質管理ツールのニーズ"
+            - "AI×FinTechの推進"
+          synergy:
+            - "マネーフォワードの開発プロセス標準化"
+            - "グループ会社への横展開"
+          contact_path: "M&A担当役員 or アドバイザー経由"
+          
+        - id: layerx
+          name: "株式会社LayerX"
+          market_cap: "未上場（評価額数百億円規模）"
+          relevance: "high"
+          rationale:
+            - "エンジニアリング文化が強い"
+            - "AI×業務効率化に注力"
+            - "急成長中で開発生産性ツールへの投資余力"
+          synergy:
+            - "LayerX開発チームの品質向上"
+            - "バクラク等SaaSプロダクトの開発効率化"
+          contact_path: "創業者ネットワーク or VC経由"
+          
+        - id: plaid
+          name: "株式会社プレイド"
+          market_cap: "約500億円"
+          relevance: "medium-high"
+          rationale:
+            - "KARTE開発でのAI活用ノウハウ蓄積"
+            - "開発ツール領域への投資実績"
+          synergy:
+            - "KARTE開発プロセスへの統合"
+          contact_path: "事業開発 or VC経由"
+
+    tier2_devtools:
+      description: "DevTools専業企業（補完的買収）"
+      candidates:
+        
+        - id: jig-jp
+          name: "JIG-SAW株式会社"
+          relevance: "medium"
+          rationale:
+            - "IoT/AIプラットフォーム"
+            - "開発支援ツール領域への関心"
+          
+        - id: because
+          name: "株式会社ビーサウス"
+          relevance: "medium"
+          rationale:
+            - "開発会社としてのツール内製ニーズ"
+
+    tier3_pe_funds:
+      description: "プライベートエクイティ・ファンド"
+      candidates:
+        
+        - id: salesforce-ventures
+          name: "Salesforce Ventures"
+          relevance: "medium-high"
+          rationale:
+            - "SaaS特化の投資ファンド"
+            - "開発者向けツールへの投資実績"
+          note: "M&Aよりマイノリティ投資が多い"
+          
+        - id: gbf
+          name: "グロービス・キャピタル・パートナーズ"
+          relevance: "medium"
+          rationale:
+            - "SaaSスタートアップへの投資実績多数"
+            - "ポートフォリオ企業へのバリューアップ支援"
+
+    tier4_international:
+      description: "海外プレイヤー（グローバル展開で優先度上昇）"
+      note: "日本市場だけでなく海外展開を行うことで、海外買収候補の優先度が大幅に上がる"
+      candidates:
+        
+        - id: atlassian
+          name: "Atlassian"
+          relevance: "high"  # 海外展開時
+          market_cap: "約$40B USD"
+          rationale:
+            - "Jira/Confluence/Trello エコシステムの拡充"
+            - "AI開発支援（Atlassian Intelligence）の強化"
+            - "小規模アクハイヤー実績多数"
+            - "オーストラリア拠点だがグローバル展開"
+          synergy:
+            - "Jira との SSOT 連携"
+            - "Confluence への AI ドキュメント生成"
+          acquisition_style: "アクハイヤー（技術+チーム）が多い"
+          contact_path: "Atlassian Ventures、LinkedIn経由"
+          
+        - id: github
+          name: "GitHub (Microsoft)"
+          relevance: "medium-high"
+          rationale:
+            - "Copilot エコシステムの拡充"
+            - "開発者ツールへの積極投資"
+            - "日本オフィスあり、日本スタートアップへの関心"
+          synergy:
+            - "Copilot × SSOT の統合"
+            - "GitHub Actions との連携"
+          barrier: "Microsoft の買収プロセスは時間がかかる"
+          contact_path: "GitHub Japan、Microsoft for Startups"
+          
+        - id: jetbrains
+          name: "JetBrains"
+          relevance: "high"
+          rationale:
+            - "IDE開発者向けツールの巨人"
+            - "AI Assistant 強化中"
+            - "チェコ拠点だがグローバル展開"
+            - "開発者体験へのこだわりが dev-OS と親和性高い"
+          synergy:
+            - "JetBrains IDE への SSOT プラグイン"
+            - "AI Assistant との統合"
+          contact_path: "JetBrains Marketplace、カンファレンス接触"
+          
+        - id: gitlab
+          name: "GitLab"
+          relevance: "medium-high"
+          market_cap: "約$8B USD"
+          rationale:
+            - "DevSecOps プラットフォームとしての拡張"
+            - "AI/ML 機能強化中"
+          synergy:
+            - "GitLab CI/CD との SSOT 連携"
+            - "コードレビュー AI の強化"
+          contact_path: "GitLab Japan、パートナープログラム"
+          
+        - id: vercel
+          name: "Vercel"
+          relevance: "medium"
+          rationale:
+            - "Next.js/React エコシステム"
+            - "開発者体験重視"
+            - "v0（AI機能）との親和性"
+          synergy:
+            - "v0 との SSOT 連携"
+          contact_path: "Vercel Japan コミュニティ"
+
+    tier5_acquisition_platforms:
+      description: "SaaS売買マーケットプレイス（海外）"
+      note: "1億円（約$660K USD）はMicroSaaS買収市場で十分な規模"
+      platforms:
+        
+        - id: acquire-com
+          name: "Acquire.com（旧MicroAcquire）"
+          description: "SaaS/MicroSaaS専門の売買マーケットプレイス"
+          typical_deal_size: "$10K〜$10M USD"
+          relevance: "very-high"
+          advantages:
+            - "買い手が積極的に探している"
+            - "バリュエーション交渉がスムーズ"
+            - "エスクローサービスあり"
+            - "匿名で売却活動可能"
+          process:
+            - "リスティング作成（無料）"
+            - "買い手からのオファー受領"
+            - "DD → クロージング"
+          timeline: "2〜6ヶ月"
+          
+        - id: flippa
+          name: "Flippa"
+          description: "ウェブサイト・SaaS売買の老舗"
+          typical_deal_size: "$1K〜$5M USD"
+          relevance: "medium"
+          
+        - id: fe-international
+          name: "FE International"
+          description: "SaaS専門M&Aアドバイザリー"
+          typical_deal_size: "$100K〜$50M USD"
+          relevance: "high"
+          note: "手数料は高いが、質の高い買い手にアクセス可能"
+
+  # ===== 3. M&A に向けた必須達成指標 =====
+  required_milestones:
+    
+    month_3:
+      name: "Q1: 基盤構築"
+      metrics:
+        mrr_target: 100000  # 10万円
+        paying_customers: 10
+        free_users: 100
+      product:
+        - "Freeプラン完全稼働"
+        - "Stripeによる Pro/Team 課金開始"
+        - "基本的なオンボーディングフロー"
+      marketing:
+        - "LP v2.0 公開完了"
+        - "Zenn記事 3本公開"
+        - "Twitter/X フォロワー 500"
+      
+    month_6:
+      name: "Q2: トラクション獲得"
+      metrics:
+        mrr_target: 500000  # 50万円
+        paying_customers: 30
+        free_users: 500
+        churn_rate_target: "< 5%"
+      product:
+        - "Linear/Plane連携 GA"
+        - "チームダッシュボード"
+        - "SSOT履歴・差分機能"
+      marketing:
+        - "導入事例 3社公開"
+        - "ウェビナー月1開催"
+        - "業界メディア掲載 2件"
+      
+    month_9:
+      name: "Q3: 成長加速"
+      metrics:
+        mrr_target: 1000000  # 100万円
+        paying_customers: 60
+        free_users: 1000
+        nrr_target: "> 110%"  # Net Revenue Retention
+      product:
+        - "Reviewer/Refiner 自動実行"
+        - "GitHub Actions統合"
+        - "API公開"
+      marketing:
+        - "カンファレンス登壇"
+        - "パートナー企業 2社"
+        - "事例記事 累計10件"
+      
+    month_12:
+      name: "Q4: Exit準備完了"
+      metrics:
+        mrr_target: 1500000  # 150万円（ARR 1,800万円相当）
+        paying_customers: 100
+        free_users: 2000
+        ltv_cac_ratio: "> 3"
+      product:
+        - "Enterprise SSO対応"
+        - "監査ログ完備"
+        - "SOC2準拠準備"
+      deal:
+        - "M&Aアドバイザー契約"
+        - "データルーム準備完了"
+        - "買収候補との事前接触開始"
+
+  # ===== 4. M&A向け機能優先順位（変更後） =====
+  feature_priority_for_exit:
+    
+    critical:
+      description: "1億円Exitに必須。これがないと買収されない"
+      features:
+        - id: stripe-billing
+          name: "Stripe課金・サブスク管理"
+          reason: "ARRを証明するための課金基盤"
+          deadline_month: 2
+          
+        - id: user-analytics
+          name: "ユーザー行動分析ダッシュボード"
+          reason: "エンゲージメント・チャーン予測のデータ"
+          deadline_month: 3
+          
+        - id: audit-log
+          name: "監査ログ・操作履歴"
+          reason: "Enterprise売上の獲得、DD対応"
+          deadline_month: 4
+          
+        - id: multi-tenant-isolation
+          name: "完全なマルチテナント分離"
+          reason: "セキュリティDD対応、Enterprise必須"
+          deadline_month: 3
+    
+    high:
+      description: "買収価格を上げるための差別化機能"
+      features:
+        - id: ai-reviewer
+          name: "AI Reviewer 自動実行"
+          reason: "技術的ユニーク性の証明"
+          deadline_month: 5
+          
+        - id: linear-plane-integration
+          name: "Linear/Plane統合"
+          reason: "ターゲット顧客（タカシさん）の獲得"
+          deadline_month: 4
+          
+        - id: ssot-diff-history
+          name: "SSOT変更履歴・差分表示"
+          reason: "チーム利用の促進、stickiness向上"
+          deadline_month: 5
+    
+    medium:
+      description: "あれば嬉しいが、Exit必須ではない"
+      features:
+        - id: github-actions
+          name: "GitHub Actions 統合"
+          deadline_month: 7
+          
+        - id: api-public
+          name: "公開API"
+          deadline_month: 8
+          
+        - id: sso-saml
+          name: "SSO/SAML対応"
+          deadline_month: 9
+    
+    medium_for_international:
+      description: "海外展開には必要。優先度を上げる"
+      features:
+        - id: english-ui
+          name: "英語UI対応"
+          reason: "海外展開には必須。LP・管理画面・ドキュメントを英語化"
+          deadline_month: 3
+          note: "日本語と英語の二言語対応で十分。多言語は不要"
+          
+        - id: international-payment
+          name: "USD決済対応"
+          reason: "Stripeで海外決済を受け付ける"
+          deadline_month: 3
+    
+    deprioritized:
+      description: "Exit戦略では優先度を下げる"
+      features:
+        - id: mcp-integration
+          name: "MCP連携"
+          reason: "技術的に面白いが、売上に直結しない"
+          
+        - id: multi-language
+          name: "3言語以上の多言語対応"
+          reason: "英語+日本語で十分。それ以上は1年では間に合わない"
+
+  # ===== 5. マーケティング戦略（日本主軸 × X/note/Zenn） =====
+  # 詳細分析: ssot/user_acquisition.yml 参照
+  # リサーチ結果: 2026-01-03
+  marketing_for_exit:
+    
+    recommended_strategy: "X/note/Zenn発信 × PLGファースト"
+    
+    # リサーチ検証済みデータ
+    research_summary:
+      source: "2026年1月調査"
+      key_findings:
+        - "検索エンジン利用率: 71.3%（最重要）"
+        - "YouTube利用率: 53.9%"
+        - "生成AIツール情報収集: 28.7%"
+        - "SNS（X等）: 20-30代で高い利用率"
+        - "ウェビナー: 33%"
+      insight: "リアルなつながり（紹介・カンファレンス）よりも、オンラインコンテンツ経由での発見が主流"
+    
+    principles:
+      - "X/note/Zennでのコンテンツ発信がメイン（コストゼロ、スケール可能）"
+      - "無料で試せることが絶対条件（PLG必須）"
+      - "バズ→LP→無料登録→有料転換のファネル"
+      - "リアルイベントは後半フェーズ（Month 7以降）"
+    
+    resource_allocation:
+      content_creation: "60%"
+      product_improvement: "30%"
+      outbound_sales: "10%（Month 7以降に強化）"
+    
+    # ===== 日本市場向け（リサーチ検証済み優先順位） =====
+    japan_marketing:
+      note: "日本ではLinkedIn営業の効果は限定的。X/note/Zennでの発信が最も効果的"
+      
+      channel_priority:
+        - rank: 1
+          channel: "X（Twitter）"
+          reason: "バズの起点。コストゼロで拡散力あり。エンジニアのホームグラウンド"
+          cost_efficiency: "very-high"
+          tactics:
+            - type: "Build in Public"
+              description: "開発過程・学び・失敗をリアルタイム共有"
+              frequency: "毎日1-3ツイート"
+            - type: "バズ狙い投稿"
+              description: "キャッチーな切り口でAI開発の課題を可視化"
+              frequency: "週1-2回"
+            - type: "エンゲージメント"
+              description: "AI開発関連の投稿にリプライ・引用RT"
+              frequency: "毎日"
+          kpi:
+            - "フォロワー: 3,000+（12ヶ月）"
+            - "月間インプレッション: 100,000+"
+          
+        - rank: 2
+          channel: "技術記事（Zenn / note / Qiita）"
+          reason: "SEO効果 + 深い信頼構築 + コンテンツ資産として蓄積"
+          cost_efficiency: "very-high"
+          tactics:
+            - type: "How-to記事"
+              description: "dev-OSの使い方・連携方法"
+              frequency: "月2-4記事"
+            - type: "思想記事"
+              description: "SSOT駆動開発・マルチLLM監査の考え方"
+              frequency: "月1-2記事"
+            - type: "事例記事"
+              description: "導入企業のビフォー・アフター"
+              frequency: "導入ごと"
+          platforms:
+            - name: "Zenn"
+              focus: "技術詳細・チュートリアル"
+              seo_power: "高"
+            - name: "note"
+              focus: "思想・ストーリー・事例"
+              sharing_power: "高"
+            - name: "Qiita"
+              focus: "Tips・実装詳細"
+              community_reach: "高"
+          target_articles:
+            - "AIで作ったコードを『確信』を持ってリリースする方法"
+            - "SSOTとは何か - AI開発時代の設計書管理"
+            - "Cursor × dev-OS で開発効率を10倍にした話"
+          kpi:
+            - "累計記事数: 30+（12ヶ月）"
+            - "月間PV: 10,000+"
+          
+        - rank: 3
+          channel: "SEO（Google検索）"
+          reason: "71.3%が検索エンジン利用。長期的な流入源"
+          cost_efficiency: "high（長期）"
+          target_keywords:
+            - "AI 開発 品質管理"
+            - "Cursor 使い方 SSOT"
+            - "AIコード レビュー 自動化"
+            - "SaaS 開発 設計書 管理"
+          
+        - rank: 4
+          channel: "AIO（AI Optimization）"
+          reason: "28.7%がAIで情報収集。新しいSEO"
+          cost_efficiency: "medium（将来性高）"
+          tactics:
+            - "公式ドキュメントの構造化"
+            - "FAQ・用語集の充実"
+            - "GitHubリポジトリの整備"
+          
+        - rank: 5
+          channel: "YouTube / デモ動画"
+          reason: "53.9%がYouTube利用。デモ動画は説得力が高い"
+          cost_efficiency: "medium"
+          content:
+            - "2-3分の製品デモ動画"
+            - "チュートリアル動画"
+            - "ユーザー事例インタビュー"
+          
+        - rank: 6
+          channel: "技術カンファレンス登壇"
+          reason: "認知度向上 + 買収候補の目に留まる（ただし初期は優先度低）"
+          cost_efficiency: "medium"
+          timing: "Month 7以降に本格化"
+          target_events:
+            - "Developers Summit"
+            - "技術書典"
+            - "SaaS業界カンファレンス"
+      
+      removed_channels:
+        - channel: "LinkedIn営業"
+          reason: "日本では効果が低い。エンジニアはLinkedInを積極的に使わない"
+        - channel: "展示会出展"
+          reason: "初期フェーズではROIが低い"
+    
+    # ===== 海外市場向け =====
+    international_marketing:
+      note: "海外展開により買収候補の幅が大幅に広がる。英語コンテンツは必須"
+      
+      channel_priority:
+        - rank: 1
+          channel: "Product Hunt"
+          reason: "DevTools のローンチに最適。海外の開発者・投資家・買収候補が集まる"
+          tactics:
+            - "Product of the Day を狙う"
+            - "ローンチ前に Hunter ネットワーク構築"
+            - "ローンチ後 48 時間の集中的な露出"
+          timing: "製品が安定した Month 3-4"
+          
+        - rank: 2
+          channel: "Hacker News"
+          reason: "DevTools に最も影響力のあるコミュニティ"
+          tactics:
+            - "Show HN 投稿"
+            - "AI開発に関する記事投稿"
+            - "コメントでの価値提供"
+          
+        - rank: 3
+          channel: "Twitter/X（英語）"
+          reason: "DevTools 創業者・開発者コミュニティの中心"
+          tactics:
+            - "Build in public（開発過程の公開）"
+            - "著名開発者とのエンゲージメント"
+            - "ARR/ユーザー数のマイルストーン共有"
+          
+        - rank: 4
+          channel: "LinkedIn（海外向けのみ）"
+          reason: "海外ではB2Bマーケティングに有効"
+          tactics:
+            - "CTO/VP Engineering へのアウトリーチ"
+            - "DevTools 関連グループでの露出"
+          
+        - rank: 5
+          channel: "Reddit（r/SaaS, r/startups, r/programming）"
+          reason: "開発者コミュニティへのリーチ"
+          
+        - rank: 6
+          channel: "IndieHackers"
+          reason: "MicroSaaS コミュニティ。Exit 経験者多数"
+          tactics:
+            - "マイルストーン投稿"
+            - "Exit 検討中であることをシグナル"
+    
+    # ===== 買収候補への認知施策 =====
+    acquirer_awareness:
+      japan:
+        - "freee/マネーフォワード等の開発イベントへの参加"
+        - "共通VCからの紹介"
+        - "Tech系メディア（TechCrunch Japan, TheBeidge）への取材対応"
+      
+      international:
+        - "Product Hunt での露出→海外DevTools企業の目に留まる"
+        - "Atlassian Marketplace / JetBrains Marketplace への連携公開"
+        - "Acquire.com へのリスティング（Month 9以降）"
+        - "GitHub/GitLab の日本オフィス経由での接触"
+    
+    pr_strategy:
+      goal: "業界内での認知度を高め、買収候補に『こんな会社があるのか』と思わせる"
+      japan_tactics:
+        - "TechCrunch Japan / TheBeidge 等への取材対応"
+        - "起業家イベントでのピッチ"
+        - "著名VCからの推薦コメント獲得"
+      international_tactics:
+        - "Product Hunt ローンチでのバズ"
+        - "Hacker News フロントページ"
+        - "TechCrunch（US）への取材ピッチ"
+
+  # ===== 6. Exit準備チェックリスト =====
+  exit_readiness_checklist:
+    
+    legal:
+      - id: ip-ownership
+        item: "知的財産権の帰属確認（コードの著作権等）"
+        status: "pending"
+      - id: contracts-review
+        item: "顧客契約の譲渡可能性確認"
+        status: "pending"
+      - id: employee-agreements
+        item: "創業者・従業員の雇用契約整備"
+        status: "pending"
+    
+    financial:
+      - id: mrr-tracking
+        item: "MRR/ARRの正確なトラッキング"
+        status: "pending"
+      - id: churn-analysis
+        item: "解約率の分析と改善施策"
+        status: "pending"
+      - id: unit-economics
+        item: "LTV/CAC/回収期間の算出"
+        status: "pending"
+    
+    technical:
+      - id: code-quality
+        item: "コード品質監査（外部レビュー）"
+        status: "pending"
+      - id: security-audit
+        item: "セキュリティ監査"
+        status: "pending"
+      - id: scalability-test
+        item: "スケーラビリティテスト"
+        status: "pending"
+    
+    operational:
+      - id: data-room
+        item: "データルーム準備（財務・契約・技術文書）"
+        status: "pending"
+      - id: advisor-selection
+        item: "M&Aアドバイザー選定・契約"
+        status: "pending"
+      - id: valuation-memo
+        item: "バリュエーションメモ作成"
+        status: "pending"
+
