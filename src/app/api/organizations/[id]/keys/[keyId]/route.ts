@@ -4,8 +4,9 @@
  */
 
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth, ApiError } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { createOrgScopedDb } from "@/lib/orgScopedDb";
 
 type RouteContext = {
   params: Promise<{ id: string; keyId: string }>;
@@ -39,12 +40,11 @@ export async function DELETE(_request: Request, context: RouteContext) {
     // 権限チェック
     await requireOrgAdminOrOwner(organizationId, auth.user.id);
 
+    const db = createOrgScopedDb(organizationId);
+
     // APIキーの存在確認と所有権確認
-    const apiKey = await prisma.apiKey.findFirst({
-      where: {
-        id: keyId,
-        organizationId,
-      },
+    const apiKey = await db.apiKey.findFirst({
+      where: { id: keyId },
     });
 
     if (!apiKey) {
@@ -52,7 +52,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     }
 
     // 物理削除
-    await prisma.apiKey.delete({
+    await db.apiKey.delete({
       where: { id: keyId },
     });
 

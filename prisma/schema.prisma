@@ -159,10 +159,16 @@ model AuditLog {
 }
 
 enum PlanType {
+  // 新プラン (v2)
   free
   pro
   team
   enterprise
+  // 旧プラン (v1) - 移行中のデータ互換性のため
+  solo
+  starter
+  growth
+  studio
 }
 
 enum MemberRole {

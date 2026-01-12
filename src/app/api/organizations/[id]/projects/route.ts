@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Prisma } from '@/generated/prisma';
-import prisma from '@/lib/prisma';
-import { ApiError, requireAuth } from '@/lib/auth';
+import { ApiError, requireAuth, requireMembership, ensureAdminOrOwner } from '@/lib/auth';
+import { createOrgScopedDb } from '@/lib/orgScopedDb';
 
 function handleError(error: unknown) {
   if (error instanceof ApiError) {
@@ -30,22 +30,6 @@ function handleError(error: unknown) {
   return NextResponse.json({ error: 'internal_server_error' }, { status: 500 });
 }
 
-async function requireMembership(userId: string, organizationId: string) {
-  const membership = await prisma.organizationMember.findFirst({
-    where: { userId, organizationId },
-  });
-  if (!membership) {
-    throw new ApiError(403, 'forbidden: not a member of organization', 'FORBIDDEN_ORG');
-  }
-  return membership;
-}
-
-function ensureAdminOrOwner(role: string) {
-  if (role !== 'owner' && role !== 'admin') {
-    throw new ApiError(403, 'forbidden: admin or owner only', 'FORBIDDEN_ROLE');
-  }
-}
-
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -56,8 +40,10 @@ export async function GET(
 
     await requireMembership(user.id, organizationId);
 
-    const projects = await prisma.workspace.findMany({
-      where: { organizationId },
+    // SEC-01: organization_id scoped DB access
+    const db = createOrgScopedDb(organizationId);
+
+    const projects = await db.workspace.findMany({
       select: {
         id: true,
         name: true,
@@ -102,7 +88,9 @@ export async function POST(
       throw new ApiError(400, 'name and slug are required', 'VALIDATION_ERROR');
     }
 
-    const project = await prisma.workspace.create({
+    const db = createOrgScopedDb(organizationId);
+
+    const project = await db.workspace.create({
       data: {
         organizationId,
         name,

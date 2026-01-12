@@ -5,10 +5,11 @@
  */
 
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth, ApiError } from "@/lib/auth";
 import { encrypt, extractKeyPrefix } from "@/lib/encryption";
 import type { LlmProvider } from "@/generated/prisma";
+import prisma from "@/lib/prisma";
+import { createOrgScopedDb } from "@/lib/orgScopedDb";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -42,12 +43,11 @@ export async function GET(_request: Request, context: RouteContext) {
     // 権限チェック
     await requireOrgAdminOrOwner(organizationId, auth.user.id);
 
+    const db = createOrgScopedDb(organizationId);
+
     // APIキー一覧取得（encryptedKeyは返さない）
-    const apiKeys = await prisma.apiKey.findMany({
-      where: {
-        organizationId,
-        isActive: true,
-      },
+    const apiKeys = await db.apiKey.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         provider: true,
@@ -94,6 +94,8 @@ export async function POST(request: Request, context: RouteContext) {
     // 権限チェック
     await requireOrgAdminOrOwner(organizationId, auth.user.id);
 
+    const db = createOrgScopedDb(organizationId);
+
     // リクエストボディ
     const body = await request.json();
     const { provider, label, apiKey } = body as {
@@ -131,9 +133,8 @@ export async function POST(request: Request, context: RouteContext) {
     const keyPrefix = extractKeyPrefix(apiKey);
 
     // 保存
-    const created = await prisma.apiKey.create({
+    const created = await db.apiKey.create({
       data: {
-        organizationId,
         provider: provider as LlmProvider,
         label,
         encryptedKey,

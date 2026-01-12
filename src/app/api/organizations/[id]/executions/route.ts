@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { requireAuth, ApiError } from "@/lib/auth";
-
-async function requireMembership(userId: string, organizationId: string) {
-  const membership = await prisma.organizationMember.findFirst({
-    where: { userId, organizationId },
-  });
-  if (!membership) {
-    throw new ApiError(403, "forbidden: not a member of organization", "FORBIDDEN_ORG");
-  }
-  return membership;
-}
+import { requireAuth, requireMembership, ApiError } from "@/lib/auth";
+import { createOrgScopedDb } from "@/lib/orgScopedDb";
 
 /**
  * GET /api/organizations/[id]/executions
@@ -31,13 +21,17 @@ export async function GET(
     const workflowId = searchParams.get("workflowId");
     const status = searchParams.get("status");
 
-    const where: Record<string, unknown> = { organizationId };
-    if (workflowId) where.workflowId = workflowId;
-    if (status === "success" || status === "error") where.status = status;
+    // SEC-01: organization_id scoped DB access
+    const db = createOrgScopedDb(organizationId);
+
+    // Build additional filters (organizationId is already enforced by db wrapper)
+    const additionalWhere: Record<string, unknown> = {};
+    if (workflowId) additionalWhere.workflowId = workflowId;
+    if (status === "success" || status === "error") additionalWhere.status = status;
 
     const [executions, total] = await Promise.all([
-      prisma.executionLog.findMany({
-        where,
+      db.executionLog.findMany({
+        where: additionalWhere,
         select: {
           id: true,
           workflowId: true,
@@ -69,7 +63,7 @@ export async function GET(
         take: limit,
         skip: offset,
       }),
-      prisma.executionLog.count({ where }),
+      db.executionLog.count({ where: additionalWhere }),
     ]);
 
     return NextResponse.json({

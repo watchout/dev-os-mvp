@@ -1,8 +1,20 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 
-async function fetchProfile() {
+type ProfileData = {
+  data: {
+    user: { id: string; email: string; name: string; avatarUrl: string | null };
+    memberships: Array<{
+      organizationId: string;
+      role: string;
+      organization: { id: string; name: string; slug: string; planId: string };
+    }>;
+  };
+};
+
+async function fetchProfile(): Promise<ProfileData | null> {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
     .getAll()
@@ -23,23 +35,18 @@ async function fetchProfile() {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to load profile");
+    return null;
   }
 
-  return res.json() as Promise<{
-    data: {
-      user: { id: string; email: string; name: string; avatarUrl: string | null };
-      memberships: Array<{
-        organizationId: string;
-        role: string;
-        organization: { id: string; name: string; slug: string; planId: string };
-      }>;
-    };
-  }>;
+  return res.json() as Promise<ProfileData>;
 }
 
 export default async function DashboardPage() {
   const profile = await fetchProfile();
+
+  if (!profile) {
+    redirect("/login");
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
