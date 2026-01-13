@@ -1,5 +1,10 @@
 {
   "slots": {
+    "marketer": {
+      "label": "Marketer / マーケティング分析・検証",
+      "defaultModel": "gpt-4o",
+      "notes": "ペルソナのペインや市場価値を検証し、技術設計前にアラインメントを取る"
+    },
     "market_analyst": {
       "label": "Market Analyst / 市場・潮流・データ解析",
       "defaultModel": "gpt-4o",

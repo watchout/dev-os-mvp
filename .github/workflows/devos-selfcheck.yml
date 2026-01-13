@@ -1,22 +1,29 @@
 name: devos selfcheck
 
-# TODO: Re-enable after migrating devos_selfcheck.ts to apps/platform
-# Temporarily disabled - will be addressed in "selfcheck CI常設" task
 on:
-  workflow_dispatch: {}  # Manual trigger only for now
-  # push:
-  #   paths:
-  #     - 'ssot/**'
-  #     - 'workflows.yml'
-  #     - 'workspace_llm_config.json'
-  #     - 'scripts/devos_selfcheck.ts'
-  #     - 'apps/web-console/**'
-  #     - '.github/workflows/devos-selfcheck.yml'
-  # pull_request: {}
+  workflow_dispatch: {}
+  push:
+    paths:
+      - 'apps/platform/ssot/**'
+      - 'apps/platform/workflows.yml'
+      - 'apps/platform/workspace_llm_config.json'
+      - 'apps/platform/scripts/devos_selfcheck.ts'
+      - 'apps/platform/.github/workflows/devos-selfcheck.yml'
+  pull_request:
+    paths:
+      - 'apps/platform/ssot/**'
+      - 'apps/platform/workflows.yml'
+      - 'apps/platform/workspace_llm_config.json'
+      - 'apps/platform/scripts/devos_selfcheck.ts'
+      - 'apps/platform/.github/workflows/devos-selfcheck.yml'
 
 jobs:
   selfcheck:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/platform
 
     steps:
       - name: Checkout repository
@@ -27,6 +34,7 @@ jobs:
         with:
           node-version: '20'
           cache: npm
+          cache-dependency-path: apps/platform/package-lock.json
 
       - name: Install dependencies
         run: npm install
