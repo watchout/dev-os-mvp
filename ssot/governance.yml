@@ -56,3 +56,54 @@ governance:
         severity: "warning"
         description: "一定時間（または一定試行）原因が特定できないまま調査が続いている。"
         recommendation: "調査ログをまとめて共有し、別視点からのレビューか、切り分け再設計を依頼する。"
+
+  # PRルール（フェーズ別ガバナンス）
+  pr_policy:
+    summary: "開発フェーズに応じたPull Request必須化ルール。課金開始前にセキュリティ・品質を担保。"
+    current_phase: "phase_2"  # 現在のフェーズ（手動更新）
+    
+    phases:
+      phase_1_2:
+        name: "Phase 1〜2: スピード優先"
+        description: "開発速度を優先し、CI通過で品質担保。PRは任意。"
+        rules:
+          - change_type: "SEC-XX（セキュリティ）"
+            pr_required: false
+            pr_recommended: true
+            ci_required: true
+          - change_type: "機能実装（2ファイル以上）"
+            pr_required: false
+            ci_required: true
+          - change_type: "バグ修正・軽微変更"
+            pr_required: false
+            ci_required: false
+
+      phase_3:
+        name: "Phase 3: 課金開始・品質担保"
+        description: "課金連携開始に伴い、セキュリティ・課金関連はPR必須。"
+        activation_checklist:
+          - "GitHub Branch Protection 設定完了"
+          - "CODEOWNERS ファイル追加"
+          - "チーム全員（AI含む）にルール周知"
+        rules:
+          - change_type: "SEC-XX（セキュリティ）"
+            pr_required: true
+            reviewer: "human_or_audit_ai"
+          - change_type: "課金関連（Stripe等）"
+            pr_required: true
+            reviewer: "human_required"
+          - change_type: "機能実装（2ファイル以上）"
+            pr_required: false
+            pr_recommended: true
+            ci_required: true
+          - change_type: "バグ修正・軽微変更"
+            pr_required: false
+            ci_required: true
+
+      phase_4:
+        name: "Phase 4: チーム拡大・全員レビュー"
+        description: "全ての変更にPRを必須化し、チーム開発の品質を担保。"
+        rules:
+          - change_type: "すべての変更"
+            pr_required: true
+            reviewer: "team_member"
