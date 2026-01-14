@@ -75,12 +75,20 @@ export default async function OrganizationDetailPage({
               slug: {org.data.slug} / plan: {org.data.planId} / role: {org.data.role}
             </p>
           </div>
-          <Link
-            href="/"
-            className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
-          >
-            ダッシュボードへ戻る
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/organizations/${org.data.id}/settings`}
+              className="text-sm font-semibold text-zinc-700 hover:text-zinc-900"
+            >
+              設定
+            </Link>
+            <Link
+              href="/"
+              className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+            >
+              ダッシュボードへ戻る
+            </Link>
+          </div>
         </div>
 
         <section className="rounded-lg border bg-white p-6 shadow-sm">
