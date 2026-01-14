@@ -58,10 +58,11 @@
 #### ⚠️ Phase 3 開始時の必須準備（ガバナンス強化）
 > **重要**: Phase 3 では PR 必須化により品質担保を強化する。課金開始前に以下を完了すること。
 
-- [ ] **GitHub Branch Protection 設定**: main ブランチへの直接 push を禁止
-- [ ] **PR 必須ルール有効化**: SEC-XX / 課金関連は PR 経由でのみマージ可
-- [ ] **CODEOWNERS 設定**: 重要ファイル（`lib/`, `api/`, `ssot/`）のレビュー必須化
-- [ ] **DEV_RULES.md の周知**: 全チームメンバー（AI含む）に Phase 3 ルールを共有
+- [ ] **GitHub Branch Protection 設定**: main ブランチへの直接 push を禁止（GitHub UI で設定）
+- [ ] **PR 必須ルール有効化**: SEC-XX / 課金関連は PR 経由でのみマージ可（Branch Protection で設定）
+- [x] **CODEOWNERS 設定**: 重要ファイル（`lib/`, `api/`, `ssot/`）のレビュー必須化
+- [x] **governance.yml 更新**: `current_phase: "phase_3"` に変更
+- [x] **DEV_RULES.md の周知**: Phase 3 PRルール追加済み（セクション 5.5）
 
 #### 実装タスク
 1.  **Stripe 課金連携**:

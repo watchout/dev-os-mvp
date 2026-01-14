@@ -1,0 +1,27 @@
+# CODEOWNERS for dev-os-mvp/apps/platform
+# Phase 3以降: PR必須化に伴うレビュー必須ファイル指定
+
+# デフォルト: 全ファイルはオーナーレビュー必須
+* @watchout
+
+# セキュリティ関連: 必須レビュー
+/src/lib/auth.ts @watchout
+/src/lib/orgScopedDb.ts @watchout
+/src/lib/encryption.ts @watchout
+/src/middleware.ts @watchout
+
+# API Routes: 必須レビュー
+/src/app/api/ @watchout
+
+# SSOT: 必須レビュー（仕様変更は慎重に）
+/ssot/ @watchout
+
+# ガバナンス・ルール: 必須レビュー
+/docs/DEV_RULES.md @watchout
+/docs/IMPLEMENTATION_PLAN.md @watchout
+
+# Prisma スキーマ: 必須レビュー
+/prisma/schema.prisma @watchout
+
+# GitHub Actions: 必須レビュー
+/.github/workflows/ @watchout

@@ -60,7 +60,7 @@ governance:
   # PRルール（フェーズ別ガバナンス）
   pr_policy:
     summary: "開発フェーズに応じたPull Request必須化ルール。課金開始前にセキュリティ・品質を担保。"
-    current_phase: "phase_2"  # 現在のフェーズ（手動更新）
+    current_phase: "phase_3"  # 現在のフェーズ（2026-01-15 Phase 3 開始）
     
     phases:
       phase_1_2:
