@@ -11,6 +11,8 @@ type ExecutionLog = {
   outputSummary: string | null;
   halt: boolean;
   haltTriggerIds: string[] | null;
+  confidenceLevel?: number | null;
+  confidenceData?: unknown;
   tokenUsage: {
     promptTokens: number;
     completionTokens: number;
@@ -97,6 +99,20 @@ export function ExecutionLogList({ organizationId }: Props) {
     );
   }
 
+  const renderConfidenceBadge = (level?: number | null) => {
+    if (!level) return <span className="text-zinc-600">-</span>;
+    const badge = {
+      1: { text: "Level 1", className: "bg-red-900/50 text-red-300 border border-red-700/50" },
+      2: { text: "Level 2", className: "bg-amber-900/50 text-amber-300 border border-amber-700/50" },
+      3: { text: "Level 3", className: "bg-green-900/50 text-green-300 border border-green-700/50" },
+    }[level] ?? { text: `Level ${level}`, className: "bg-zinc-800 text-zinc-300 border border-zinc-700" };
+    return (
+      <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ${badge.className}`}>
+        {badge.text}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto rounded-lg border border-zinc-700">
@@ -106,6 +122,7 @@ export function ExecutionLogList({ organizationId }: Props) {
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-400">ワークフロー</th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-400">ステータス</th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-400">Halt</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-400">確信レベル</th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-400">課金タイプ</th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-400">トークン</th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-400">実行時間</th>
@@ -140,6 +157,7 @@ export function ExecutionLogList({ organizationId }: Props) {
                     <span className="text-zinc-600">-</span>
                   )}
                 </td>
+                <td className="px-4 py-3 text-sm">{renderConfidenceBadge(log.confidenceLevel)}</td>
                 <td className="px-4 py-3 text-sm text-zinc-400">
                   {log.billingType === "byo_key" ? (
                     <span className="text-blue-400">🔑 BYO Key</span>

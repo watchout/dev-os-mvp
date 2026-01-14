@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback, type ReactNode } from "react";
-import { evaluateConfidenceLevel, type ConfidenceResult } from "@/lib/confidence-level-client";
+import { evaluateConfidenceLevel, type ConfidenceResult, type ConfidenceLevel } from "@/lib/confidence-level-client";
 import { ConfidenceMeter } from "@/components/ConfidenceMeter";
+import { ConfidenceBeforeAfter } from "@/components/ConfidenceBeforeAfter";
 
 type WorkflowSummary = {
   id: string;
@@ -30,7 +31,14 @@ type WorkflowRunResult = {
   artifacts: Record<string, string>;
   startedAt: string;
   completedAt: string;
-  confidenceLevel?: number;
+  confidenceLevel?: number | null;
+  confidenceData?: {
+    label?: string;
+    improvement_hint?: string;
+    missing_elements?: Array<{ message?: string }>;
+    before_after?: { before?: string; after?: string };
+  } | null;
+  executionLogId?: string;
 };
 
 type Organization = {
@@ -65,6 +73,53 @@ export function WorkflowRunModal({ workflow }: Props) {
   // 確信レベル（事前評価）
   const [confidence, setConfidence] = useState<ConfidenceResult | null>(null);
   const [confidenceLoading, setConfidenceLoading] = useState(false);
+  const [beforeConfidence, setBeforeConfidence] = useState<ConfidenceResult | null>(null);
+  const [afterConfidence, setAfterConfidence] = useState<ConfidenceResult | null>(null);
+
+const levelLabel = (lvl: ConfidenceLevel) => {
+  if (lvl === 1) return "漂う開発（バイブス）";
+  if (lvl === 2) return "不透明な設計";
+  return "確信ある設計";
+};
+
+const toConfidenceResult = (
+  level?: number | null,
+  data?: {
+    label?: string;
+    improvement_hint?: string;
+    missing_elements?: Array<{ message?: string }>;
+    before_after?: { before?: string; after?: string };
+  } | null,
+): ConfidenceResult | null => {
+  if (!level) return null;
+  const normalized: ConfidenceLevel = level <= 1 ? 1 : level === 2 ? 2 : 3;
+  const label = (data?.label as string) || levelLabel(normalized);
+  const hints: string[] = [];
+  if (Array.isArray(data?.missing_elements)) {
+    data.missing_elements.forEach((m) => {
+      if (m?.message) hints.push(String(m.message));
+    });
+  }
+  if (data?.improvement_hint) {
+    hints.push(String(data.improvement_hint));
+  }
+  if (hints.length === 0 && data?.before_after?.after) {
+    hints.push(`改善後の提案: ${data.before_after.after}`);
+  }
+
+  return {
+    level: normalized,
+    label,
+    action: normalized === 1 ? "halt" : normalized === 2 ? "warn" : "allow",
+    hints,
+    details: {
+      hasSSOTReference: Boolean(data?.before_after?.after) || false,
+      hasObjective: Boolean(data?.before_after?.after) || false,
+      hasConstraints: Array.isArray(data?.missing_elements) ? data.missing_elements.length === 0 : false,
+      hasEdgeCases: Array.isArray(data?.missing_elements) ? data.missing_elements.length === 0 : false,
+    },
+  };
+};
   
   const isLLMWorkflow = LLM_WORKFLOWS.includes(workflow.id);
 
@@ -132,6 +187,8 @@ export function WorkflowRunModal({ workflow }: Props) {
     setError(null);
     setResult(null);
     setLoading(true);
+    setAfterConfidence(null);
+    setBeforeConfidence(confidence ? { ...confidence } : null);
     
     // LLMワークフローの場合は入力を含める
     const payload: Record<string, string> = {};
@@ -190,6 +247,8 @@ export function WorkflowRunModal({ workflow }: Props) {
       }
       const data = await res.json();
       setResult(data?.data ?? null);
+      const derivedAfter = toConfidenceResult(data?.data?.confidenceLevel, data?.data?.confidenceData);
+      setAfterConfidence(derivedAfter);
     } catch (e) {
       setError("ネットワークエラーが発生しました。");
     } finally {
@@ -357,6 +416,11 @@ export function WorkflowRunModal({ workflow }: Props) {
                 <p className="text-xs text-zinc-500">
                   {result.startedAt} → {result.completedAt}
                 </p>
+
+                <div className="mt-4">
+                  <ConfidenceBeforeAfter before={beforeConfidence} after={afterConfidence} />
+                </div>
+
                 <ul className="mt-4 space-y-3">
                   {result.steps.map((step) => (
                     <li key={step.order} className="rounded-lg border bg-white p-3 shadow-sm">
@@ -394,6 +458,21 @@ export function WorkflowRunModal({ workflow }: Props) {
                     </li>
                   ))}
                 </ul>
+
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      setResult(null);
+                      setError(null);
+                      setAfterConfidence(null);
+                    }}
+                    className="rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50"
+                  >
+                    閉じる
+                  </button>
+                </div>
               </div>
             )}
           </div>
