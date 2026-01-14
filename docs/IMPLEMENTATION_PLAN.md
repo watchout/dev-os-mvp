@@ -48,8 +48,8 @@
 1.  **マルチテナント・データ境界の確立**:
     - [ ] Prisma スキーマの完全適用（`organization_id` による RLS 前提のクエリ徹底）
 2.  **確信レベル強化（Phase 2.5）**:
-    - [ ] Before/After 比較の可視化 UI
-    - [ ] Reviewer 実行後の `confidenceLevel` を結果表示に反映
+    - [x] Before/After 比較の可視化 UI（`ConfidenceBeforeAfter.tsx`）
+    - [x] Reviewer 実行後の `confidenceLevel` を結果表示に反映（ExecutionLogList, WorkflowRunModal）
     - [ ] NLP ベースの高度な判定ロジック（将来検討）
 
 ### 🟩 Phase 3: Monetization & Reliability (課金 & アルファ開始)
