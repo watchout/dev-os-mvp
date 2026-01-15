@@ -263,7 +263,59 @@ Phase 3開始時に以下を確認：
 
 ---
 
-## 6. このフローの「SaaS化」に向けた前提
+## 6. AIツール役割分担（Cursor AI / Claude Code）
+
+本プロジェクトでは **Cursor AI** と **Claude Code** を併用し、それぞれの特性を活かして開発を進める。
+
+### 6.1 役割分担表
+
+| 役割 | 担当ツール | 理由 |
+|------|-----------|------|
+| **設計・相談・レビュー** | Cursor AI | 対話的・コンテキスト維持に優れる |
+| **小〜中規模実装（1〜3ファイル）** | Cursor AI | IDE連携・リアルタイム編集 |
+| **大規模リファクタリング** | Claude Code | 一括変更・長時間作業に強い |
+| **E2E/全リンクテスト実行** | Claude Code | 長時間・自動実行向き |
+| **CI/CD監視・修正** | Claude Code | ターミナル操作に強い |
+| **UI目視確認** | Cursor AI | Playwright MCP連携 |
+| **環境変数・インフラ設定** | Claude Code | 設定ファイル・ターミナル操作 |
+
+### 6.2 標準ワークフロー
+
+```
+1. Cursor AI: 設計・実装計画を相談
+2. Cursor AI or Claude Code: 実装（規模に応じて選択）
+3. Cursor AI: UI目視確認（Playwright MCP）
+4. Claude Code: 全リンク・E2Eテスト実行
+5. Cursor AI: 結果レビュー・修正指示
+6. Claude Code: 修正実行・再テスト
+7. Cursor AI: 最終確認・マージ
+```
+
+### 6.3 Claude Code への依頼テンプレート
+
+Claude Code にタスクを依頼する際は、以下の形式を推奨する：
+
+```
+【プロジェクト】dev-os-mvp / apps/platform
+【タスク】E2Eテスト実行
+【手順】
+1. cd /path/to/apps/platform
+2. npm run typecheck && npm run lint && npm run test
+3. 全APIエンドポイントの疎通確認
+4. 結果をmarkdown形式で報告
+【注意点】
+- DEV_RULES.md に従う
+- エラー時は修正案を提示
+```
+
+### 6.4 引き継ぎルール
+
+- Cursor AI → Claude Code へタスクを引き継ぐ際は、**現在の状態・次にやるべきこと**を明記する
+- Claude Code → Cursor AI への報告は、**結果サマリー・エラー一覧・推奨アクション**を含める
+
+---
+
+## 7. このフローの「SaaS化」に向けた前提
 
 将来、この開発OSは以下のような形でサービス化されることを前提にする。
 

@@ -107,3 +107,80 @@ governance:
           - change_type: "すべての変更"
             pr_required: true
             reviewer: "team_member"
+
+  # AIツール役割分担（Cursor AI / Claude Code）
+  ai_tool_roles:
+    summary: "Cursor AI と Claude Code の特性を活かした役割分担定義"
+    
+    cursor_ai:
+      name: "Cursor AI"
+      strengths:
+        - "IDE連携・リアルタイム編集"
+        - "ブラウザ操作（Playwright MCP）"
+        - "ユーザーとの対話的なやり取り"
+        - "コンテキスト維持"
+      responsibilities:
+        - role: "設計・相談・レビュー"
+          priority: "primary"
+        - role: "小〜中規模実装（1〜3ファイル）"
+          priority: "primary"
+        - role: "UI目視確認"
+          priority: "primary"
+        - role: "結果レビュー・修正指示"
+          priority: "primary"
+
+    claude_code:
+      name: "Claude Code"
+      strengths:
+        - "長時間のターミナル作業"
+        - "バックグラウンド実行"
+        - "大規模一括変更"
+        - "テスト自動実行"
+      responsibilities:
+        - role: "大規模リファクタリング"
+          priority: "primary"
+        - role: "E2E/全リンクテスト実行"
+          priority: "primary"
+        - role: "CI/CD監視・修正"
+          priority: "primary"
+        - role: "環境変数・インフラ設定"
+          priority: "primary"
+
+    workflow:
+      description: "標準的な開発フローにおける役割分担"
+      steps:
+        - step: 1
+          tool: "cursor_ai"
+          action: "設計・実装計画を相談"
+        - step: 2
+          tool: "cursor_ai_or_claude_code"
+          action: "実装（規模に応じて選択）"
+        - step: 3
+          tool: "cursor_ai"
+          action: "UI目視確認（Playwright MCP）"
+        - step: 4
+          tool: "claude_code"
+          action: "全リンク・E2Eテスト実行"
+        - step: 5
+          tool: "cursor_ai"
+          action: "結果レビュー・修正指示"
+        - step: 6
+          tool: "claude_code"
+          action: "修正実行・再テスト"
+        - step: 7
+          tool: "cursor_ai"
+          action: "最終確認・マージ"
+
+    handoff_rules:
+      - from: "cursor_ai"
+        to: "claude_code"
+        required_info:
+          - "現在の状態"
+          - "次にやるべきこと"
+          - "注意点・制約"
+      - from: "claude_code"
+        to: "cursor_ai"
+        required_info:
+          - "結果サマリー"
+          - "エラー一覧（あれば）"
+          - "推奨アクション"
