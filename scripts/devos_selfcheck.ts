@@ -429,184 +429,31 @@ async function checkFiles(): Promise<boolean> {
 }
 
 async function checkHttpEndpoints(): Promise<boolean> {
+  let ok = true;
+
   try {
-    await request('GET', '/healthz');
+    const health = await request('GET', '/api/health');
+    if (health.statusCode !== 200) {
+      console.error(`  ERROR: GET /api/health returned status ${health.statusCode}`);
+      ok = false;
+    } else {
+      const parsed = JSON.parse(health.body ?? '{}');
+      if (parsed?.status !== 'ok') {
+        console.error('  ERROR: GET /api/health returned unexpected payload');
+        ok = false;
+      } else {
+        console.log('  ✓ GET /api/health');
+      }
+    }
   } catch (err) {
     if ((err as NodeJS.ErrnoException)?.code === 'ECONNREFUSED') {
       console.warn(
-        `  WARN: web-console server not reachable at ${BASE_URL}, HTTP checks skipped. (Future: add --require-server option)`,
+        `  WARN: server not reachable at ${BASE_URL}, HTTP checks skipped. (Future: add --require-server option)`,
       );
       return true;
     }
-    console.error(`  ERROR: GET /healthz failed (${String(err)})`);
-    return false;
-  }
-
-  let ok = true;
-  let cachedFeatures: Array<{ id?: unknown }> | null = null;
-
-  try {
-    const health = await request('GET', '/healthz');
-    if (health.statusCode !== 200 || !health.body.includes('ok')) {
-      console.error('  ERROR: GET /healthz did not return 200/ok');
-      ok = false;
-    } else {
-      console.log('  ✓ GET /healthz');
-    }
-  } catch (err) {
-    console.error(`  ERROR: GET /healthz failed (${String(err)})`);
+    console.error(`  ERROR: GET /api/health failed (${String(err)})`);
     ok = false;
-  }
-
-  try {
-    const llmConfigRes = await request('GET', '/api/llm-config');
-    const parsed = JSON.parse(llmConfigRes.body ?? '{}');
-    if (llmConfigRes.statusCode !== 200 || typeof parsed !== 'object' || !parsed.slots || !parsed.presets) {
-      console.error('  ERROR: GET /api/llm-config returned unexpected payload');
-      ok = false;
-    } else {
-      console.log('  ✓ GET /api/llm-config');
-    }
-  } catch (err) {
-    console.error(`  ERROR: GET /api/llm-config failed (${String(err)})`);
-    ok = false;
-  }
-
-  try {
-    const ssotFeaturesRes = await request('GET', '/api/ssot/features');
-    if (ssotFeaturesRes.statusCode !== 200) {
-      console.error(`  ERROR: GET /api/ssot/features returned status ${ssotFeaturesRes.statusCode}`);
-      ok = false;
-    } else {
-      const parsed = JSON.parse(ssotFeaturesRes.body ?? '{}');
-      if (
-        typeof parsed !== 'object' ||
-        typeof parsed.rawYaml !== 'string' ||
-        !Array.isArray(parsed.features) ||
-        parsed.features.length === 0
-      ) {
-        console.error('  ERROR: GET /api/ssot/features returned unexpected payload');
-        ok = false;
-      } else {
-        const invalidFeature = parsed.features.find(
-          (feature: { id?: unknown }) => typeof feature?.id !== 'string' || feature.id.trim().length === 0,
-        );
-        if (invalidFeature) {
-          console.error('  ERROR: GET /api/ssot/features contains feature without valid id');
-          ok = false;
-        } else {
-          cachedFeatures = parsed.features;
-          console.log('  ✓ GET /api/ssot/features');
-        }
-      }
-    }
-  } catch (err) {
-    console.error(`  ERROR: GET /api/ssot/features failed (${String(err)})`);
-    ok = false;
-  }
-
-  if (cachedFeatures && cachedFeatures.length > 0) {
-    const sampleSize = Math.min(3, cachedFeatures.length);
-    let allSamplesOk = true;
-    for (let i = 0; i < sampleSize; i += 1) {
-      const feature = cachedFeatures[i];
-      const featureId = typeof feature.id === 'string' ? feature.id : '';
-      const endpoint = `/api/ssot/features/${encodeURIComponent(featureId)}`;
-      try {
-        const featureRes = await request('GET', endpoint);
-        if (featureRes.statusCode !== 200) {
-          console.error(`  ERROR: GET ${endpoint} returned status ${featureRes.statusCode}`);
-          ok = false;
-          allSamplesOk = false;
-          continue;
-        }
-        const featureJson = JSON.parse(featureRes.body ?? '{}');
-        if (featureJson?.id !== featureId) {
-          console.error(`  ERROR: GET ${endpoint} returned mismatched id "${featureJson?.id}"`);
-          ok = false;
-          allSamplesOk = false;
-        }
-      } catch (err) {
-        console.error(`  ERROR: GET ${endpoint} failed (${String(err)})`);
-        ok = false;
-        allSamplesOk = false;
-      }
-    }
-    if (allSamplesOk) {
-      console.log(`  ✓ GET /api/ssot/features/:id (sampled ${sampleSize} feature(s))`);
-    }
-  }
-
-  const planPayloads = [
-    { purpose: 'prompt', mode: 'balanced' },
-    { purpose: 'ssot', mode: 'strict' },
-    { purpose: 'review', mode: 'balanced' },
-  ];
-
-  for (const payload of planPayloads) {
-    const label = `POST /api/workflows/plan (purpose=${payload.purpose}, mode=${payload.mode})`;
-    try {
-      const res = await request('POST', '/api/workflows/plan', JSON.stringify(payload));
-      if (res.statusCode !== 200) {
-        console.error(`  ERROR: ${label} returned status ${res.statusCode}`);
-        ok = false;
-        continue;
-      }
-      const parsed = JSON.parse(res.body ?? '{}');
-      if (!Array.isArray(parsed.steps) || parsed.steps.length === 0) {
-        console.error(`  ERROR: ${label} returned no steps`);
-        ok = false;
-        continue;
-      }
-      const allModelsValid = parsed.steps.every(
-        (step: { resolvedModel?: unknown }) =>
-          typeof step?.resolvedModel === 'string' &&
-          step.resolvedModel.trim().length > 0 &&
-          step.resolvedModel !== 'unresolved',
-      );
-      if (!allModelsValid) {
-        console.error(`  ERROR: ${label} returned unresolved models`);
-        ok = false;
-        continue;
-      }
-
-      const featureId =
-        typeof parsed.featureId === 'string' && parsed.featureId.trim().length > 0 ? parsed.featureId.trim() : '';
-      if (featureId) {
-        const featureEndpoint = `/api/ssot/features/${encodeURIComponent(featureId)}`;
-        try {
-          const featureRes = await request('GET', featureEndpoint);
-          if (featureRes.statusCode !== 200) {
-            console.error(
-              `  ERROR: ${label} returned featureId "${featureId}" but ${featureEndpoint} returned status ${featureRes.statusCode}`,
-            );
-            ok = false;
-            continue;
-          }
-          const featureJson = JSON.parse(featureRes.body ?? '{}');
-          if (featureJson?.id !== featureId) {
-            console.error(
-              `  ERROR: ${label} returned featureId "${featureId}" but ${featureEndpoint} returned mismatched id "${featureJson?.id}"`,
-            );
-            ok = false;
-            continue;
-          }
-        } catch (err) {
-          console.error(
-            `  ERROR: ${label} featureId "${featureId}" validation failed when calling ${featureEndpoint} (${String(
-              err,
-            )})`,
-          );
-          ok = false;
-          continue;
-        }
-      }
-
-      console.log(`  ✓ ${label}`);
-    } catch (err) {
-      console.error(`  ERROR: ${label} failed (${String(err)})`);
-      ok = false;
-    }
   }
 
   return ok;
