@@ -1,135 +1,83 @@
+# .github/workflows/marketing-automation.yml
 # マーケティング自動化ワークフロー
 #
 # 機能:
-# 1. Zenn記事公開時のX自動告知
-# 2. 予約投稿の定期実行
-# 3. 週次KPIレポート生成
+#   - 毎日3回の自動投稿（朝/昼/夜）
+#   - ABテストによるコンテンツ最適化
+#   - メトリクス自動収集
+#   - 週次レポート生成
+#
+# 必要なSecrets:
+#   X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET
 
 name: Marketing Automation
 
 on:
-  # Zenn記事の変更を検知
-  push:
-    paths:
-      - 'articles/*.md'
-    branches:
-      - main
-  
-  # 定期実行スケジュール（ゴールデンタイム対応）
   schedule:
-    # 日本時間 09:30 (UTC 00:30) - 朝の投稿
+    # 朝投稿 (09:30 JST = 00:30 UTC)
     - cron: '30 0 * * *'
-    # 日本時間 12:00 (UTC 03:00) - 昼の投稿
+    # 昼投稿 (12:00 JST = 03:00 UTC)
     - cron: '0 3 * * *'
-    # 日本時間 12:15 (UTC 03:15) - 記事告知用
-    - cron: '15 3 * * *'
-    # 日本時間 20:30 (UTC 11:30) - 夜の投稿（思想型）
-    - cron: '30 11 * * *'
-    # 日本時間 21:00 (UTC 12:00) - 夜の投稿（開発ログ）
+    # 夜投稿 (21:00 JST = 12:00 UTC)
     - cron: '0 12 * * *'
-    # 毎朝リマインダー（日本時間 08:00 = UTC 23:00 前日）
-    - cron: '0 23 * * *'
-    # 週次レポート（日曜 10:00 JST = 土曜 01:00 UTC）
-    - cron: '0 1 * * 0'
+    # メトリクス収集 (毎日 06:00 JST = 21:00 UTC前日)
+    - cron: '0 21 * * *'
+    # 週次レポート (毎週月曜 09:00 JST = 00:00 UTC)
+    - cron: '0 0 * * 1'
   
-  # 手動実行
+  # 手動実行も可能
   workflow_dispatch:
     inputs:
       action:
-        description: '実行するアクション'
+        description: 'Action to run'
         required: true
-        default: 'process-scheduled'
+        default: 'post_noon'
         type: choice
         options:
-          - process-scheduled
-          - generate-kpi-report
-          - announce-article
-          - daily-reminder
+          - post_morning
+          - post_noon
+          - post_night
+          - collect_metrics
+          - weekly_report
+          - test_dry_run
 
 jobs:
-  # ========================================
-  # Zenn記事公開時のX自動告知
-  # ========================================
-  announce-article:
-    if: |
-      github.event_name == 'push' || 
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'announce-article')
+  # 朝投稿 (09:30 JST)
+  post_morning:
+    if: github.event.schedule == '30 0 * * *' || github.event.inputs.action == 'post_morning'
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2  # 差分検出用
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
       
-      - name: Find published articles
-        id: find-articles
-        run: |
-          # 変更されたarticlesファイルを検出
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- 'articles/*.md' || echo "")
-          echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
-          
-          # published: true のファイルを抽出
-          PUBLISHED_ARTICLES=""
-          for file in $CHANGED_FILES; do
-            if [ -f "$file" ]; then
-              if grep -q "published: true" "$file"; then
-                PUBLISHED_ARTICLES="$PUBLISHED_ARTICLES $file"
-              fi
-            fi
-          done
-          echo "published_articles=$PUBLISHED_ARTICLES" >> $GITHUB_OUTPUT
-      
-      - name: Generate announcement tweets
-        if: steps.find-articles.outputs.published_articles != ''
-        run: |
-          for file in ${{ steps.find-articles.outputs.published_articles }}; do
-            # 記事のメタデータを抽出
-            TITLE=$(grep "^title:" "$file" | sed 's/title: *"\(.*\)"/\1/')
-            SLUG=$(basename "$file" .md)
-            
-            # 投稿内容を生成
-            TWEET="記事を公開しました ✍️
-
-          $TITLE
-
-          https://zenn.dev/iyasaka/articles/$SLUG?utm_campaign=x_auto_announce
-
-          #Zenn #AI開発 #dev-OS"
-            
-            echo "Announcing: $TITLE"
-            echo "$TWEET"
-            
-            # X APIで投稿（環境変数が設定されている場合）
-            if [ -n "${{ secrets.X_API_KEY }}" ]; then
-              # ここで投稿スクリプトを呼び出し
-              echo "Would post to X (secrets configured)"
-            else
-              echo "X API not configured, skipping actual post"
-            fi
-          done
+      - name: Post morning content
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: npx ts-node scripts/marketing/auto_post.ts post morning
+      
+      - name: Commit post history
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add content/post_history.json
+          git diff --staged --quiet || git commit -m "📊 Update post history (morning)"
+          git push
 
-  # ========================================
-  # 予約投稿の定期実行
-  # ========================================
-  process-scheduled:
-    if: |
-      github.event_name == 'schedule' || 
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'process-scheduled')
+  # 昼投稿 (12:00 JST)
+  post_noon:
+    if: github.event.schedule == '0 3 * * *' || github.event.inputs.action == 'post_noon'
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v4
       
@@ -137,38 +85,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       
       - name: Install dependencies
-        run: |
-          npm ci
-          npm install twitter-api-v2
+        run: npm ci
       
-      - name: Process scheduled posts
-        run: |
-          npx ts-node scripts/marketing/post_to_x.ts process
+      - name: Post noon content
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: npx ts-node scripts/marketing/auto_post.ts post noon
       
-      - name: Commit updated schedule
+      - name: Commit post history
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add content/x_schedule.json content/x_posted_log.json || true
-          git diff --staged --quiet || git commit -m "chore: update X post schedule"
-          git push || true
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add content/post_history.json
+          git diff --staged --quiet || git commit -m "📊 Update post history (noon)"
+          git push
 
-  # ========================================
-  # 週次KPIレポート生成
-  # ========================================
-  generate-kpi-report:
-    if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 1 * * 0') || 
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'generate-kpi-report')
+  # 夜投稿 (21:00 JST)
+  post_night:
+    if: github.event.schedule == '0 12 * * *' || github.event.inputs.action == 'post_night'
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v4
       
@@ -176,36 +117,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
       
-      - name: Generate KPI report
-        run: |
-          npx ts-node scripts/marketing/generate_kpi_report.ts
+      - name: Post night content
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: npx ts-node scripts/marketing/auto_post.ts post night
       
-      - name: Commit KPI report
+      - name: Commit post history
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add docs/reports/kpi_*.md || true
-          git diff --staged --quiet || git commit -m "chore: add weekly KPI report"
-          git push || true
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add content/post_history.json
+          git diff --staged --quiet || git commit -m "📊 Update post history (night)"
+          git push
 
-  # ========================================
-  # 毎朝のリマインダー（抜け漏れチェック）
-  # ========================================
-  daily-reminder:
-    if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') || 
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'daily-reminder')
+  # メトリクス収集 (毎日 06:00 JST)
+  collect_metrics:
+    if: github.event.schedule == '0 21 * * *' || github.event.inputs.action == 'collect_metrics'
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v4
       
@@ -213,47 +149,79 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
       
-      - name: Check content schedule
-        id: check-schedule
-        run: |
-          OUTPUT=$(npx ts-node scripts/marketing/check_content_schedule.ts today 2>&1)
-          echo "$OUTPUT"
-          
-          # アラートがあるかチェック
-          if echo "$OUTPUT" | grep -q "🚨\|⚠️"; then
-            echo "has_alerts=true" >> $GITHUB_OUTPUT
-            echo "::warning::投稿抜け漏れの可能性があります"
-          else
-            echo "has_alerts=false" >> $GITHUB_OUTPUT
-          fi
+      - name: Collect metrics
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: npx ts-node scripts/marketing/collect_metrics.ts collect
       
-      - name: Create GitHub Issue for alerts
-        if: steps.check-schedule.outputs.has_alerts == 'true'
-        uses: actions/github-script@v7
+      - name: Commit metrics
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add content/post_history.json
+          git diff --staged --quiet || git commit -m "📈 Update post metrics"
+          git push
+
+  # 週次レポート (毎週月曜 09:00 JST)
+  weekly_report:
+    if: github.event.schedule == '0 0 * * 1' || github.event.inputs.action == 'weekly_report'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          script: |
-            const today = new Date().toISOString().split('T')[0];
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `📅 コンテンツ投稿リマインダー (${today})`,
-              body: `## 本日の投稿予定をご確認ください
-            
-            自動チェックの結果、投稿の抜け漏れまたは未完了タスクが検出されました。
-            
-            ### 確認方法
-            \`\`\`bash
-            npm run marketing:check
-            \`\`\`
-            
-            ### カレンダー確認
-            - \`content/calendar/2026-01.yml\`
-            
-            ---
-            このIssueは GitHub Actions により自動生成されました。`,
-              labels: ['marketing', 'reminder']
-            });
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Generate weekly report
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: npx ts-node scripts/marketing/collect_metrics.ts report
+      
+      - name: Commit report
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add content/metrics/
+          git diff --staged --quiet || git commit -m "📊 Weekly marketing report"
+          git push
+
+  # テスト（ドライラン）
+  test_dry_run:
+    if: github.event.inputs.action == 'test_dry_run'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Dry run test
+        run: |
+          echo "🧪 Testing auto_post.ts..."
+          npx ts-node scripts/marketing/auto_post.ts test noon
+          echo ""
+          echo "🧪 Testing collect_metrics.ts..."
+          npx ts-node scripts/marketing/collect_metrics.ts report
