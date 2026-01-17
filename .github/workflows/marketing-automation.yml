@@ -64,7 +64,7 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-        run: npx ts-node scripts/marketing/auto_post.ts post morning
+        run: npx tsx scripts/marketing/auto_post.ts post morning
       
       - name: Commit post history
         run: |
@@ -96,7 +96,7 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-        run: npx ts-node scripts/marketing/auto_post.ts post noon
+        run: npx tsx scripts/marketing/auto_post.ts post noon
       
       - name: Commit post history
         run: |
@@ -128,7 +128,7 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-        run: npx ts-node scripts/marketing/auto_post.ts post night
+        run: npx tsx scripts/marketing/auto_post.ts post night
       
       - name: Commit post history
         run: |
@@ -160,7 +160,7 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-        run: npx ts-node scripts/marketing/collect_metrics.ts collect
+        run: npx tsx scripts/marketing/collect_metrics.ts collect
       
       - name: Commit metrics
         run: |
@@ -192,7 +192,7 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-        run: npx ts-node scripts/marketing/collect_metrics.ts report
+        run: npx tsx scripts/marketing/collect_metrics.ts report
       
       - name: Commit report
         run: |
@@ -221,7 +221,7 @@ jobs:
       - name: Dry run test
         run: |
           echo "🧪 Testing auto_post.ts..."
-          npx ts-node scripts/marketing/auto_post.ts test noon
+          npx tsx scripts/marketing/auto_post.ts test noon
           echo ""
           echo "🧪 Testing collect_metrics.ts..."
-          npx ts-node scripts/marketing/collect_metrics.ts report
+          npx tsx scripts/marketing/collect_metrics.ts report
