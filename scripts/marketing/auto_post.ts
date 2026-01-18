@@ -22,6 +22,12 @@ import * as dotenv from 'dotenv';
 
 // 環境変数読み込み（dotenvを使用）
 function loadEnvFile(): void {
+  // 既に環境変数が設定されている場合はスキップ（GitHub Actions用）
+  if (process.env.X_API_KEY && process.env.X_ACCESS_TOKEN) {
+    console.log('📁 Using environment variables from system');
+    return;
+  }
+
   // .env.api を最優先で探す（プロジェクトルート → apps/platform の順）
   const searchPaths = [
     path.join(__dirname, '../../../..', '.env.api'),     // dev-os-mvp/.env.api
@@ -39,6 +45,8 @@ function loadEnvFile(): void {
       return;
     }
   }
+  
+  console.log('⚠️ No .env file found and no environment variables set');
 }
 
 loadEnvFile();
