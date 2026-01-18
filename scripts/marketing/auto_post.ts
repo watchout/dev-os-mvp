@@ -139,14 +139,14 @@ function getTodayPosts(pool: ABTestPool, slot: string): Post[] {
 // 未投稿の投稿を取得（今日以前で未投稿のもの）
 function getPendingPosts(pool: ABTestPool, history: PostHistory[], slot: string): Post[] {
   const today = getTodayJST();
-  const postedIds = new Set(history.map(h => `${h.post_id}_${h.posted_at.split('T')[0]}`));
+  // post_id のみでチェック（一度投稿したテーマは再投稿しない）
+  const postedIds = new Set(history.map(h => h.post_id));
   
   return pool.posts.filter(p => {
-    const key = `${p.id}_${p.scheduled_date}`;
     return p.scheduled_date <= today && 
            p.slot === slot && 
            p.status === 'active' &&
-           !postedIds.has(key);
+           !postedIds.has(p.id);
   });
 }
 
