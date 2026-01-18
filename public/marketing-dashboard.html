@@ -436,9 +436,14 @@
         return;
       }
       
+      const avatarUrl = window.dashboardData?.user?.profileImageUrl || '';
+      const avatarHtml = avatarUrl 
+        ? `<img src="${avatarUrl}" alt="avatar" style="width: 48px; height: 48px; border-radius: 50%;">`
+        : '🐦';
+      
       container.innerHTML = history.map(post => `
         <div class="post-item">
-          <div class="post-avatar">🐦</div>
+          <div class="post-avatar">${avatarHtml}</div>
           <div class="post-content">
             <div class="post-meta">
               <span class="post-slot ${post.slot}">${getSlotLabel(post.slot)}</span>
@@ -485,6 +490,9 @@
           console.error('API Error:', data.error);
           return;
         }
+        
+        // グローバルにデータを保存（アバター用）
+        window.dashboardData = data;
         
         // Stats
         document.getElementById('total-posts').textContent = data.stats.totalPosts;
