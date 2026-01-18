@@ -12,6 +12,10 @@
 
 name: Marketing Automation
 
+# GitHub Actions がリポジトリにpushできるようにする
+permissions:
+  contents: write
+
 on:
   schedule:
     # 朝投稿 (09:30 JST = 00:30 UTC)
