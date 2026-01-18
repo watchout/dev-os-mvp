@@ -25,8 +25,25 @@ interface PostHistory {
   };
 }
 
+interface UserInfo {
+  username: string;
+  name: string;
+  profileImageUrl: string;
+  followers: number;
+  following: number;
+  tweets: number;
+  updatedAt: string;
+}
+
 export async function GET() {
   try {
+    // ユーザー情報を読み込み
+    const userInfoPath = path.join(process.cwd(), 'content/user_info.json');
+    let userInfo: UserInfo | null = null;
+    if (fs.existsSync(userInfoPath)) {
+      userInfo = JSON.parse(fs.readFileSync(userInfoPath, 'utf-8'));
+    }
+
     // 投稿履歴を読み込み
     const historyPath = path.join(process.cwd(), 'content/post_history.json');
     let history: PostHistory[] = [];
@@ -66,6 +83,7 @@ export async function GET() {
     const currentDay = (daysDiff % 7) + 1;
     
     return NextResponse.json({
+      user: userInfo,
       stats: {
         totalPosts,
         totalImpressions,
