@@ -18,35 +18,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
+import * as dotenv from 'dotenv';
 
-// 環境変数読み込み
+// 環境変数読み込み（dotenvを使用）
 function loadEnvFile(): void {
-  const envFiles = ['.env.api', '.env.local', '.env'];
-  const projectRoot = path.join(__dirname, '../..');
+  // .env.api を最優先で探す（プロジェクトルート → apps/platform の順）
+  const searchPaths = [
+    path.join(__dirname, '../../../..', '.env.api'),     // dev-os-mvp/.env.api
+    path.join(__dirname, '../..', '.env.api'),           // apps/platform/.env.api
+    path.join(__dirname, '../../../..', '.env.local'),   // dev-os-mvp/.env.local
+    path.join(__dirname, '../..', '.env.local'),         // apps/platform/.env.local
+    path.join(__dirname, '../../../..', '.env'),         // dev-os-mvp/.env
+    path.join(__dirname, '../..', '.env'),               // apps/platform/.env
+  ];
   
-  for (const envFile of envFiles) {
-    const envPath = path.join(projectRoot, envFile);
+  for (const envPath of searchPaths) {
     if (fs.existsSync(envPath)) {
-      console.log(`📁 Loading environment from: ${envFile}`);
-      const content = fs.readFileSync(envPath, 'utf-8');
-      
-      for (const line of content.split('\n')) {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith('#')) continue;
-        
-        const match = trimmed.match(/^([^=]+)=(.*)$/);
-        if (match) {
-          const key = match[1].trim();
-          let value = match[2].trim();
-          if ((value.startsWith('"') && value.endsWith('"')) ||
-              (value.startsWith("'") && value.endsWith("'"))) {
-            value = value.slice(1, -1);
-          }
-          if (!process.env[key]) {
-            process.env[key] = value;
-          }
-        }
-      }
+      console.log(`📁 Loading environment from: ${envPath}`);
+      dotenv.config({ path: envPath });
       return;
     }
   }
