@@ -1,0 +1,146 @@
+# ssot/influencer_watch.yml
+# インフルエンサー監視設定
+#
+# 変更履歴:
+#   2026-01-20: 初版作成
+
+version: "1.0"
+last_updated: "2026-01-20"
+
+description: |
+  AI開発系インフルエンサーの投稿を監視し、
+  バズパターンを自動抽出するための設定ファイル
+
+# ===== 監視対象アカウント =====
+accounts:
+  
+  # Tier 1: 大規模アカウント（10万+フォロワー）
+  tier1:
+    - handle: "masahirochaen"
+      name: "チャエン | デジライズ CEO"
+      followers: 150000
+      category: "AIニュース"
+      style: "毎朝AIニュース最速発信"
+      min_likes_threshold: 500
+      learn_from:
+        - "速報性"
+        - "毎日の習慣化"
+        - "実務寄りの内容"
+      
+    - handle: "shota7180"
+      name: "木内翔大 | SHIFT AI代表"
+      followers: 140000
+      category: "AI活用"
+      style: "モチベ系＋ツールTips"
+      min_likes_threshold: 500
+      learn_from:
+        - "ビジョン語り"
+        - "コミュニティ形成"
+  
+  # Tier 2: 中規模アカウント（3-10万フォロワー）
+  tier2:
+    - handle: "ai_jitan"
+      name: "えーたん/AI×時短で仕事効率化"
+      followers: 80000
+      category: "ツール活用"
+      style: "ツール活用法を動画付き解説"
+      min_likes_threshold: 300
+      learn_from:
+        - "動画デモ必須"
+        - "再現可能な手順"
+        - "コピペで完了"
+      buzz_rate: "最高（万バズ複数）"
+      priority: "最重要"
+      
+    - handle: "taziku_co"
+      name: "田中義弘 | AI×Creative"
+      followers: 50000
+      category: "AIクリエイティブ"
+      style: "生成AI動画・アニメ制作の最先端事例"
+      min_likes_threshold: 200
+      learn_from:
+        - "ビジュアル多用"
+        - "クリエイティブ開発者向け"
+  
+  # Tier 3: 成長中アカウント（1-3万フォロワー）
+  tier3:
+    - handle: "Fujin_Metaverse"
+      name: "Fujin | AI自動化の人"
+      followers: 30000
+      category: "AIエージェント"
+      style: "AIエージェント・自動化のステップバイステップ"
+      min_likes_threshold: 100
+      learn_from:
+        - "スレッド形式"
+        - "詳細な手順"
+        - "再現性の高さ"
+        
+    - handle: "commte"
+      name: "コムテ | Agentic AI"
+      followers: 25000
+      category: "Claude Code"
+      style: "Claude Code/Skill Marketplace実践"
+      min_likes_threshold: 100
+      learn_from:
+        - "技術深掘り"
+        - "開発者向け"
+        
+    - handle: "akira_papa_IT"
+      name: "あきらパパ | 生成AI活用エンジニア"
+      followers: 20000
+      category: "エンジニア実践"
+      style: "AIエージェント組織構築やtmux活用"
+      min_likes_threshold: 100
+      learn_from:
+        - "動画付き"
+        - "わかりやすい説明"
+
+# ===== 分析対象カテゴリ =====
+categories:
+  - name: "ツール活用"
+    description: "AI開発ツールの具体的な使い方"
+    relevance: "high"
+    
+  - name: "AIエージェント"
+    description: "自動化・エージェント構築"
+    relevance: "high"
+    
+  - name: "Claude Code"
+    description: "Claude Code/Cursor活用"
+    relevance: "very_high"
+    
+  - name: "AIニュース"
+    description: "最新のAI動向"
+    relevance: "medium"
+    
+  - name: "エンジニア実践"
+    description: "実務でのAI活用事例"
+    relevance: "high"
+
+# ===== バズ判定基準 =====
+buzz_thresholds:
+  tier1:
+    min_likes: 500
+    min_impressions: 50000
+  tier2:
+    min_likes: 300
+    min_impressions: 30000
+  tier3:
+    min_likes: 100
+    min_impressions: 10000
+
+# ===== 抽出する要素 =====
+extraction_elements:
+  - hook_type: "冒頭のフック（正直、断言します、等）"
+  - structure: "投稿の構造（問題提起→解決策、等）"
+  - visual: "ビジュアル要素の種類"
+  - key_elements: "バズ要因のキーワード"
+  - timing: "投稿時間帯"
+  - hashtags: "使用ハッシュタグ"
+
+# ===== 監視スケジュール =====
+schedule:
+  frequency: "hourly"
+  cron: "0 * * * *"  # 毎時0分
+  max_tweets_per_account: 20
+  max_patterns_to_store: 100

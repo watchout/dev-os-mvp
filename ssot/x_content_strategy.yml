@@ -1,0 +1,471 @@
+# ssot/x_content_strategy.yml
+# dev-OS X投稿戦略 SSOT
+#
+# 変更履歴:
+#   2026-01-19: 初版作成（AI系インフルエンサー投稿型分析に基づく）
+#   2026-01-20: アルゴリズム最適化対応（Visual Boost, TweepCred対策）
+#   2026-01-20: Grokリサーチ結果を反映（バズ投稿パターン分析）
+
+version: "2.1"
+last_updated: "2026-01-20"
+
+# ===== 0. Grok分析に基づくバズ要素（2026-01-20更新） =====
+grok_research_insights:
+  
+  analysis_date: "2026-01-20"
+  data_source: "直近1ヶ月のAI開発系バズ投稿（いいね1000+）"
+  
+  # ❗ 必須要素（これがないとバズらない）
+  required_elements:
+    visual: 
+      importance: "エンゲージメントの8割を占める"
+      formats: ["スクショ", "操作動画(30-70秒)", "対比画像"]
+      rule: "全投稿にビジュアル必須"
+    
+    hook_words:
+      description: "冒頭で注意を引く感情喚起ワード"
+      examples:
+        - "正直、"
+        - "断言します"
+        - "最強すぎ"
+        - "最終兵器"
+        - "有能すぎ"
+        - "嘘みたいだけど"
+        - "やばい"
+    
+    structure:
+      description: "①②③のステップ形式で再現性を強調"
+      pattern: "問題提起 → 解決ツール → 手順 → まとめ"
+      
+    numbers:
+      description: "具体的な数字で説得力を出す"
+      examples: ["最短3分", "月10万円", "80%削減", "一撃で完成"]
+
+  # 🕐 最適な投稿時間（データ検証済み）
+  optimal_posting_times:
+    weekday:
+      morning: "08:00-10:00"  # 出勤前・通勤中
+      evening: "18:00-21:00"  # 帰宅後
+    weekend:
+      afternoon: "12:00-17:00"  # 休み中に試したい心理
+    
+    recommended_slots:
+      - time: "09:00"
+        reason: "通勤中の情報収集層"
+      - time: "20:00"
+        reason: "帰宅後のリラックスタイム"
+
+  # 📊 参考アカウント（影響力順）
+  benchmark_accounts:
+    - handle: "@masahirochaen"
+      followers: 150000
+      style: "毎朝7-8時AIニュース最速発信"
+      learn_from: "速報性、毎日の習慣化"
+      
+    - handle: "@shota7180"
+      followers: 140000
+      style: "モチベ系＋ツールTips"
+      learn_from: "ビジョン語り、コミュニティ形成"
+      
+    - handle: "@ai_jitan"
+      followers: 80000
+      style: "ツール活用法を動画付き解説"
+      learn_from: "動画デモ必須、再現可能な手順"
+      buzz_rate: "最高（万バズ複数）"
+      
+    - handle: "@Fujin_Metaverse"
+      followers: 30000
+      style: "AIエージェント・自動化のステップバイステップ"
+      learn_from: "スレッド形式、詳細な手順"
+      
+    - handle: "@commte"
+      followers: 25000
+      style: "Claude Code/Skill Marketplace実践"
+      learn_from: "技術深掘り、開発者向け"
+
+  # 🔥 バズ投稿の実例パターン
+  buzz_patterns:
+    
+    pattern_1_weakness_solution:
+      name: "弱点解決パターン"
+      source: "@ai_jitan NotebookLM×AiPPT投稿"
+      metrics: "いいね2,500超、閲覧53万"
+      structure:
+        hook: "正直、NotebookLMスライド機能の最大の弱点は…"
+        body: "問題を共有 → 解決ツール紹介 → 動画デモ"
+        cta: "割引コード or 無料トライアル導線"
+      dev_os_adaptation: |
+        正直、dev-OSの最大の弱点は〇〇でした。
+        でもこの方法で爆速解決🔥
+        
+        手順👇
+        [動画: 解決プロセスのデモ]
+        
+    pattern_2_step_by_step_income:
+      name: "ステップで稼ぐ/効率化パターン"
+      source: "@genkai_syatikuu Geminiでnote月10万"
+      metrics: "いいね2,800超、閲覧37万"
+      structure:
+        hook: "嘘みたいな話だけど、実際に月10万円稼げた"
+        body: "①〜⑧のステップで超詳細"
+        numbers: "初月1-3万、継続30万"
+        emphasis: "やることはコピペして出すだけ"
+      dev_os_adaptation: |
+        嘘みたいだけど、dev-OSでAI開発が月〇〇時間短縮できた手順公開↓
+        
+        ① 〇〇を準備
+        ② dev-OSで〇〇を実行
+        ③ 結果を〇〇に適用
+        
+        [動画: 実際の操作デモ]
+        
+    pattern_3_summon_celebrity:
+      name: "召喚/デモパターン"
+      source: "@ai_jitan AI社長召喚"
+      metrics: "いいね2,523超、閲覧53万"
+      structure:
+        hook: "究極のAI社長召喚術"
+        body: "有名人名出し＋インパクトあるコンセプト"
+        cta: "リプ欄で詳細解説（続きを読ませる）"
+      dev_os_adaptation: |
+        dev-OSで有名エンジニアの思考を召喚する方法見つけた🔥
+        
+        どんなコードも一撃で…
+        
+        続きはリプ欄👇
+        [動画: マルチターミナルデモ]
+
+  # 🎯 @ai_risukirin 改善施策
+  improvement_actions:
+    
+    immediate:
+      - action: "全投稿にビジュアル必須化"
+        priority: "最高"
+        
+      - action: "フック語「正直、」「断言します」の使用"
+        priority: "最高"
+        
+      - action: "投稿時間を09:00/20:00に固定"
+        priority: "高"
+        
+    short_term:
+      - action: "影響力アカウントへ実例付きリプライ"
+        target: ["@ai_jitan", "@Fujin_Metaverse"]
+        frequency: "1日20件"
+        
+      - action: "AI開発系中小アカウント100人フォロー"
+        expected_return: "50%フォローバック"
+        
+    medium_term:
+      - action: "dev-OS設定テンプレート無料配布"
+        format: "Gist or Notion"
+        purpose: "価値提供＋拡散"
+
+# ===== 1. アルゴリズム最適化戦略（2026年版） =====
+algorithm_optimization:
+  
+  core_principle: "TweepCred（信頼スコア）の最大化とVisual Boostの活用"
+  
+  ranking_weights:
+    like: 30      # 最重要：保存・後で見返す価値（ブックマーク的な使われ方）
+    retweet: 20   # 拡散シグナル
+    reply: 1      # 議論は拡散にあまり寄与しない
+    media_boost: "x2.0"  # 画像・動画付きはインプ2倍
+    premium_boost: "x4.0" # X Premiumアカウントはフォロワーへの表示4倍
+
+  visual_guidelines:
+    policy: "原則として全投稿に視覚要素（画像・動画・GIF）を添付する"
+    formats:
+      code_snippet:
+        type: "Image (16:9)"
+        tool: "Carbon / Ray.so / Figma"
+        style: "高コントラスト、シンタックスハイライト強調"
+        usage: "コードのBefore/After、断片的なTips"
+      
+      micro_demo:
+        type: "Video/GIF (5-10秒)"
+        aspect: "16:9 or 9:16"
+        requirement: "字幕/キャプション必須（音無し再生前提）"
+        usage: "機能の実行結果、補完の瞬間、UIの動き"
+        
+      contrast_card:
+        type: "Image (16:9)"
+        style: "左右分割（左:NG / 右:OK）"
+        usage: "概念の比較、バイブコーディングvsSSOT"
+
+  tweep_cred_maintenance:
+    - "X Premium（青バッジ）の維持（基本スコア +100）"
+    - "Grokによる品質評価対策（定型文・ハッシュタグ乱用を避ける）"
+    - "シャドウバン回避（短期間の連続投稿・過度なメンションを控える）"
+
+# ===== 2. 投稿型定義（テンプレート） =====
+post_types:
+  
+  # 型❶: 問題提起＋断言型
+  problem_statement:
+    id: "type_01"
+    name: "問題提起＋断言型"
+    description: "短く強いフックと画像で共感を呼び、いいね（同意）を狙う"
+    structure:
+      hook: "【逆張り/数字】〇〇、そろそろ限界じゃない？ / 9割が誤解している〇〇"
+      body: "現状の問題を端的に指摘（2-3行）"
+      visual: "テキスト画像 or 問いかけスライド（文字大きめ）"
+      cta: "「共感したらいいね」を促す（保存価値）"
+    best_for: ["バズ狙い", "認知拡大", "議論喚起"]
+    timing: ["月曜12:00", "金曜12:00"]
+    example: |
+      バイブコーディング、そろそろ限界じゃないですか？
+
+      「なんとなく」で作ると「なんとなく」のものしかできない。
+      
+      Cursorに「いい感じに作って」と言っても、AIは「いい感じ」が分からない。
+      
+      仕様書がない開発は、地図なしの航海と同じです。
+
+      #AI開発 #Cursor
+      [画像: 荒波に揉まれる小舟(Vibe Coding) vs 豪華客船(SSOT) のイラスト]
+
+  # 型❷: Before/After型
+  before_after:
+    id: "type_02"
+    name: "Before/After型（Visual重視）"
+    description: "悪い例→良い例を1枚の画像で対比させ、視覚的に価値を伝える"
+    structure:
+      hook: "【NG】〇〇 → 【OK】〇〇"
+      body: "何が変わったか、具体的な効果（数字など）"
+      visual: "左右分割の対比画像（Scannability重視）"
+      cta: "「後で見返すために保存（いいね）推奨」"
+    best_for: ["保存", "シェア", "説得力"]
+    timing: ["木曜12:00"]
+    example: |
+      AI開発でよくあるミス ⚠️
+
+      左：曖昧な指示（結果が毎回ブレる）
+      右：SSOT定義済み（100回やっても同じ結果）
+
+      プロンプトに「ssot/schema.ymlに従え」と書くだけで、
+      手直し時間が8割減ります。
+
+      #AI開発 #Tips
+      [画像: 左側に汚いコードとエラー、右側に整然としたコードと成功ログ]
+
+  # 型❸: 発見共有型（数字マジック）
+  discovery:
+    id: "type_03"
+    name: "発見共有型（数字マジック）"
+    description: "具体的な数字を用いた実験結果や気づきを共有"
+    structure:
+      hook: "〇〇したら【数字】倍になった / 【数字】個試してわかったこと"
+      body: "具体的なデータと結論"
+      visual: "グラフ、集計表、スクリーンショット"
+      cta: "学びや示唆で締める"
+    best_for: ["信頼獲得", "専門性アピール"]
+    timing: ["日曜21:00"]
+    example: |
+      SSOTを導入して、コードレビュー時間を計測してみた。
+
+      ・導入前: 平均 45分/PR
+      ・導入後: 平均 8分/PR
+
+      実に「82%」の時短。
+      AIが仕様違反を事前に弾くから、人間はロジックだけ見ればいい。
+
+      #SSOT #生産性
+      [画像: 劇的に下がった棒グラフのキャプチャ]
+
+  # 型❹: Tips/ノウハウ型（Micro Demo）
+  tips:
+    id: "type_04"
+    name: "Tips/ノウハウ型（Micro Demo）"
+    description: "5秒で伝わる動画/GIFと共に具体的なノウハウを提供"
+    structure:
+      hook: "Cursorで〇〇する神機能 / 3秒で終わる〇〇"
+      body: "手順を箇条書きでシンプルに"
+      visual: "5-10秒のGIF/動画（字幕付き）"
+      cta: "「使えそうなら保存」"
+    best_for: ["フォロー獲得", "保存", "価値提供"]
+    timing: ["火曜09:30", "金曜09:30"]
+    example: |
+      Cursor Tips 💡
+      
+      「Command + K」でファイルを作らせる時、
+      @design_doc を参照させるだけで精度が段違いになる。
+
+      実際の挙動がこちら👇
+
+      #Cursor #Tips
+      [動画: プロンプト入力→完璧なコード生成までの早回し動画]
+
+  # 型❺: 物語型（Build in Public）
+  story:
+    id: "type_05"
+    name: "物語型（BiP）"
+    description: "開発の裏側を見せ、応援したくなるストーリーを語る"
+    structure:
+      hook: "【失敗談】〇〇を作って大失敗した話"
+      body: "経緯・苦労・そこからの逆転/学び"
+      visual: "開発中の生々しい画面、失敗ログのスクショ"
+      cta: "共感or応援のいいね"
+    best_for: ["ファン化", "エンゲージメント深化", "ブランディング"]
+    timing: ["水曜21:00"]
+    example: |
+      正直、dev-OSの開発は一度挫折しかけました。
+
+      「AIがあれば仕様書はいらない」と信じて突っ走った結果、
+      1ヶ月後に誰も触れないスパゲッティコードが完成。
+
+      そこから「仕様をYAMLで書く」という原点回帰に至るまで。
+
+      #dev-OS #BuildInPublic
+      [画像: エラーだらけのターミナル画面]
+
+  # 型❻: 検証/比較型
+  comparison:
+    id: "type_06"
+    name: "検証/比較型"
+    description: "ツールやモデルの比較結果を視覚的に提示"
+    structure:
+      hook: "Claude 3.5 vs GPT-4o、コーディング対決"
+      body: "比較基準と勝者、その理由"
+      visual: "比較表（マトリクス図）"
+      cta: "「あなたはどっち派？」"
+    best_for: ["議論喚起", "専門性アピール"]
+    timing: ["金曜09:30"]
+    example: |
+      Claude 3.5 Sonnet vs GPT-4o
+      
+      Reactコンポーネント実装で対決させてみた。
+
+      ・UIセンス: Claude 🏆
+      ・ロジック: GPT-4o 🏆
+      ・速度: 引き分け
+
+      フロントエンドはClaude一択かもしれない。
+      
+      #Claude #GPT #AI開発
+      [画像: 生成結果の比較スクリーンショット]
+
+  # 型❼: トレンド便乗型
+  trend:
+    id: "type_07"
+    name: "トレンド便乗型"
+    description: "トレンドワード×自社視点でポジショントーク"
+    structure:
+      hook: "【速報】〇〇が来た / 話題の〇〇、エンジニア視点だと..."
+      body: "独自の切り口での見解"
+      visual: "公式リリースの引用画像 or 速報スクショ"
+      cta: "議論への参加を促す"
+    best_for: ["初動Imp", "タイムリー性"]
+    timing: ["随時（トレンド発生時）"]
+    trigger: "Grokでトレンド検知"
+
+  # 型❽: スレッド解説型
+  thread:
+    id: "type_08"
+    name: "スレッド解説型"
+    description: "深い知見をスレッドで展開し、滞在時間を稼ぐ"
+    structure:
+      tweet1: "【フック】逆張り/数字 ＋ 結論画像"
+      tweet2: "【結論】3行で要約"
+      tweet3~: "詳細解説（各ツイートに画像推奨）"
+      last: "まとめ＋「役立ったらいいね/RT」"
+    best_for: ["保存", "プロフクリック", "権威性構築"]
+    timing: ["土曜10:00"]
+    length: "5-8ツイート"
+
+# ===== 3. 週間投稿スケジュール（改定版） =====
+weekly_schedule:
+  monday:
+    - time: "12:00"
+      type: "problem_statement"
+      goal: "週初めのバズ狙い（Visual必須）"
+      
+  tuesday:
+    - time: "09:30"
+      type: "tips"
+      goal: "Micro Demo動画で機能訴求"
+      
+  wednesday:
+    - time: "21:00"
+      type: "story"
+      goal: "失敗談・裏側公開でファン化"
+      
+  thursday:
+    - time: "12:00"
+      type: "before_after"
+      goal: "比較画像でプロダクト価値証明"
+      
+  friday:
+    - time: "09:30"
+      type: "comparison"
+      goal: "技術選定の知見共有"
+      
+  saturday:
+    - time: "10:00"
+      type: "thread"
+      goal: "長文解説で保存数稼ぎ"
+      
+  sunday:
+    - time: "21:00"
+      type: "discovery"
+      goal: "週の実験結果まとめ（数字重視）"
+
+# ===== 4. ABテスト設計 =====
+ab_test:
+  enabled: true
+  method: "random_selection"
+  variants_per_theme: 2
+  
+  evaluation:
+    metric: "engagement_rate"  # (likes + retweets) / impressions
+    min_impressions: 500
+    winner_threshold: 1.2
+    
+  learning:
+    update_winning_patterns: true
+    few_shot_injection: true
+
+# ===== 5. コンテンツテーマ =====
+content_themes:
+  core:
+    - "バイブコーディングの限界と脱却"
+    - "SSOT（信頼できる唯一の情報源）の効能"
+    - "AI開発における「仕様」の復権"
+    - "Cursor × dev-OS 実践テクニック"
+    
+  secondary:
+    - "マルチLLM時代のアーキテクチャ"
+    - "AIネイティブなチーム開発論"
+    - "プロンプトよりコンテキスト設計"
+    
+  seasonal:
+    - "新機能（Playwright連携など）の実況"
+    - "開発合宿・ハッカソンレポート"
+
+# ===== 6. ハッシュタグ戦略 =====
+hashtags:
+  primary:
+    - "#AI開発"
+    - "#Cursor"
+    - "#SSOT"
+    
+  secondary:
+    - "#dev-OS"
+    - "#BuildInPublic"
+    - "#個人開発"
+    
+  rules:
+    max_count: 2  # アルゴリズム的に2個までが最適
+    placement: "本文の最後（改行して分離）"
+
+# ===== 7. 投稿品質チェックリスト =====
+posting_rules:
+  character_limit: 280
+  media_check: "画像または動画がついているか？（必須）"
+  hook_check: "数字が含まれているか？ または常識への逆張りがあるか？"
+  cta_check: "「保存（いいね）」を促す文脈になっているか？"
+  
+  quality_checks:
+    - "ターゲット（開発者）が『自分のことだ』と思えるか"
+    - "5秒で内容が理解できるVisualがあるか"
+    - "広告っぽさ（売り込み臭）が消えているか"
